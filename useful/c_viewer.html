@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Html viewer for creaters</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <style>
+    #pillState {display: none !important;}
+    :root{
+      /* ===== theme: #1a1c1c base ===== */
+      --bg:#1a1c1c;
+      --panel:#1a1c1c;
+      --panel2:#202222;
+      --line:rgba(255,255,255,.10);
+      --txt:#e9ecef;
+      --muted:rgba(233,236,239,.68);
+      --accent:#7c3aed;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+  
+      --radius:14px;
+      --shadow: 0 14px 30px rgba(0,0,0,.45);
+  
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo","Noto Sans KR", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  
+      --drawerPeek: 64px;
+      --drawerOpen: 78vh;
+    }
+  
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(124,58,237,.14), transparent 58%),
+        radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.08), transparent 58%),
+        var(--bg);
+      color:var(--txt);
+    }
+  
+    .app{
+      height:100%;
+      display:grid;
+      grid-template-columns: 480px 1fr;
+      gap:14px;
+      padding:14px;
+      min-height:0;
+    }
+    @media (max-width: 780px){ .app{grid-template-columns:1fr;} }
+  
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 35%), var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+  
+    .topbar{
+      padding:12px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .brand{display:flex;gap:10px;align-items:center;min-width:0}
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.2) 35%, transparent 60%), var(--accent);
+      box-shadow:0 0 0 3px rgba(124,58,237,.18);
+      flex:0 0 auto;
+    }
+    .brand h1{margin:0;font-size:13px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand p{margin:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  
+    .controls{display:flex;gap:8px;align-items:center;flex:0 0 auto; flex-wrap:wrap}
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--txt);
+      padding:8px 10px;
+      border-radius:12px;
+      font-size:12px;
+      cursor:pointer;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+      white-space:nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.14); background:rgba(255,255,255,.045);}
+    .btn:active{transform:translateY(1px)}
+    .btn.on{border-color: rgba(124,58,237,.60); background: rgba(124,58,237,.18);}
+  
+    .tabs{
+      display:flex;
+      gap:8px;
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      background: var(--panel2);
+    }
+    .tab{
+      flex:1 1 auto;
+      text-align:center;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      color:var(--muted);
+      cursor:pointer;
+      font-size:12px;
+      background:rgba(255,255,255,.02);
+      transition: background .15s ease, border-color .15s ease, color .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab.on{
+      color:var(--txt);
+      border-color: rgba(124,58,237,.60);
+      background: rgba(124,58,237,.14);
+    }
+  
+    .editorWrap{
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:0;
+      flex:1;
+    }
+  
+    textarea{
+      overflow-anchor: none;
+      width:100%;
+      min-height:0;
+      flex:1;
+      resize:none;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--txt);
+      padding:12px;
+      font-family: var(--mono);
+      font-size:12px;
+      line-height:1.55;
+      outline:none;
+    }
+    textarea:focus{
+      border-color: rgba(124,58,237,.60);
+      box-shadow: 0 0 0 4px rgba(124,58,237,.18);
+      background: rgba(255,255,255,.05);
+    }
+  
+    .status{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      color:var(--muted);
+      font-size:12px;
+      min-width:0;
+    }
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+      min-width:0;
+      font-size:12px;
+    }
+    .pill b{color:var(--txt)}
+    .pill.good{color:var(--good)}
+    .pill.warn{color:var(--warn)}
+    .pill.bad{color:var(--bad)}
+    .msg{color:#fecaca; min-height:1em;}
+  
+    /* RIGHT */
+    .previewTop{
+      padding:12px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    }
+    .deviceShell{
+      /* padding:12px; */
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      min-height:0;
+      flex:1;
+      overflow:auto;
+    }
+    .frame{
+      /* border:1px solid var(--line);
+      border-radius:18px;
+      background: rgba(255,255,255,.03);
+      box-shadow: 0 18px 40px rgba(0,0,0,.38); */
+      overflow:hidden;
+    }
+    .frame.pc{width: 980px; min-height: 680px;}
+    .frame.mo{width: 390px; min-height: 780px; border-radius:28px;}
+    .frameHeader{
+      display: none !important;
+      height:40px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:0 12px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
+      color:var(--muted);
+      font-size:12px;
+      justify-content:space-between;
+    }
+    .traffic{display:flex; gap:6px;}
+    .traffic i{
+      width:10px;height:10px;border-radius:50%;
+      display:inline-block;
+      background: rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.14);
+    }
+  
+    .cd-page{
+      height:calc(100% - 40px);
+      overflow:auto;
+    }
+    .cd-introBox{
+      overflow: hidden;
+    }
+    .cd-head{
+      padding:16px 16px 14px 16px;
+      background: linear-gradient(135deg,#111827,#0f172a);
+      color:#fff;
+    }
+    .cd-title{font-weight:900;font-size:16px;letter-spacing:.2px;}
+    .cd-sub{margin-top:6px;font-size:12px;opacity:.85;}
+    .cd-body{
+      padding:16px;
+      color:#111827;
+      line-height:1.6;
+      font-family: var(--sans);
+    }
+    .cd-divider{border:none;border-top:1px solid #e5e7eb;margin:14px 0;}
+    .cd-hint{
+      font-size:12px;
+      color:#64748b;
+      background:#f1f5f9;
+      border:1px dashed #cbd5e1;
+      padding:10px 12px;
+      border-radius:12px;
+    }
+    .cd-body img{max-width:100%;height:auto;}
+    .cd-body a{color:#2563eb}
+    .cd-body table{max-width:100%;border-collapse:collapse}
+  
+    .pre {background-color: #1a1c1c !important;}
+  
+    /* ========= Mobile Drawer ========= */
+    @media (max-width: 780px){
+      .app{padding: 0 !important; gap:10px;}
+  
+      #editorPanel{
+        position: fixed;
+        width: 100%;
+        /* left: 10px;
+        right: 10px; */
+        bottom: 0;
+        z-index: 50;
+        border-radius: 18px;
+        height: var(--drawerPeek);
+        transition: height .22s ease;
+        min-height:0;
+      }
+      #editorPanel.is-open{ height: var(--drawerOpen); }
+  
+      #editorPanel .topbar,
+      #editorPanel .tabs,
+      #editorPanel .editorWrap{ display:none; }
+  
+      #editorPanel.is-open .tabs,
+      #editorPanel.is-open .editorWrap{ display:flex; }
+  
+      #editorPanel.is-open .editorWrap{ flex:1; min-height:0; }
+      #editorPanel.is-open textarea{ flex:1; min-height:0; }
+  
+      #previewPanel{ padding-bottom: calc(var(--drawerPeek) + 14px); border: none; border-radius: 0;}
+      #editorPanel.is-open ~ #previewPanel{ padding-bottom: calc(var(--drawerOpen) + 14px); }
+  
+      .brand p{display:none;}
+    }
+  
+    .drawerHandle{
+      display:none;
+      padding:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent);
+      border-bottom:1px solid var(--line);
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    @media (max-width: 780px){ .drawerHandle{display:flex;} }
+  
+    .grab{display:none !important;}
+  </style>
+  
+</head>
+
+<body>
+  <div class="app">
+    <!-- LEFT (Editor) -->
+    <section class="panel" id="editorPanel">
+      <!-- Mobile drawer handle -->
+      <div class="drawerHandle" id="drawerHandle">
+        <button class="btn" id="btnCopyMobile">전체 복사</button>
+        <button class="btn on" id="btnToggleEditor">입력창 열기</button>
+      </div>
+
+      <div class="topbar">
+        <div class="brand">
+          <span class="dot"></span>
+          <div style="min-width:0"><h1>Editor</h1></div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="btnCopyPC">전체 복사</button>
+          <button class="btn" id="btnPC">PC</button>
+          <button class="btn" id="btnMO">MO</button>
+          <button class="btn" id="btnClear">지우기</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab on" data-tab="char">캐릭터 소개</div>
+        <div class="tab" data-tab="creator">크리에이터 코멘트</div>
+      </div>
+
+      <div class="editorWrap">
+        <textarea id="editor" spellcheck="false"></textarea>
+
+        <div class="status">
+          <div class="pill" id="pillLimit">
+            제한: <b id="limitLabel">15,000</b>자 · 현재(HTML): <b id="cntHtml">0</b>자
+          </div>
+          <div class="msg" id="warn"></div>
+          <div class="pill">요소 클릭 시 해당하는 태그의 시작 부분이 하이라이트 됩니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT (Preview) -->
+    <section class="panel pre" id="previewPanel">
+      <div class="previewTop">
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:900;letter-spacing:.2px">HTML Preview</div>
+          <div style="font-size:12px;color:var(--muted)">오류 제보 X: @Olli_mine</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="pill"><b id="tabName">캐릭터 소개</b></div>
+        </div>
+      </div>
+
+      <div class="deviceShell" id="shell">
+        <div class="frame pc" id="frame">
+          <div class="frameHeader">
+            <span class="traffic"><i></i><i></i><i></i></span>
+            <span id="frameLabel">PC Frame</span>
+            <span style="opacity:.8">Intro Box</span>
+          </div>
+
+          <div class="cd-page">
+            <div class="cd-introBox">
+              <div class="cd-body" id="previewRoot">
+                <div id="slot"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== Config =====
+    const LIMITS = { char: 15000, creator: 30000 };
+
+    // ===== DOM =====
+    const btnCopyPC = document.getElementById("btnCopyPC");
+    const btnCopyMobile = document.getElementById("btnCopyMobile");
+
+    const editorPanel = document.getElementById("editorPanel");
+    const drawerHandle = document.getElementById("drawerHandle");
+    const btnToggleEditor = document.getElementById("btnToggleEditor");
+
+    const editor = document.getElementById("editor");
+    const slot = document.getElementById("slot");
+    const previewRoot = document.getElementById("previewRoot");
+
+    const btnPC = document.getElementById("btnPC");
+    const btnMO = document.getElementById("btnMO");
+    const btnClear = document.getElementById("btnClear");
+
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const frame = document.getElementById("frame");
+    const frameLabel = document.getElementById("frameLabel");
+    const boxTitle = document.getElementById("boxTitle");
+    const tabName = document.getElementById("tabName");
+
+    const cntHtml = document.getElementById("cntHtml");
+    const limitLabel = document.getElementById("limitLabel");
+    const pillLimit = document.getElementById("pillLimit");
+    const warn = document.getElementById("warn");
+
+    // ===== State (세션 메모리만, 저장 없음) =====
+    const state = {
+      mode: "pc",
+      activeTab: "char",
+      drafts: { char: "", creator: "" },
+      editorOpenMobile: false
+    };
+
+    // 클릭 포커싱용 맵: id -> {start, end}
+    let idToRange = new Map();
+
+    // ===== Utils =====
+    function formatNum(n){ return new Intl.NumberFormat("ko-KR").format(n); }
+    function getLimitForTab(tab){ return LIMITS[tab] || 15000; }
+
+    // ===== Copy =====
+    async function copyAllToClipboard(){
+      const text = editor.value || "";
+      if(!text.trim()) return false;
+
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch(e){
+        try{
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          ta.style.top = "0";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          return ok;
+        }catch(err){
+          return false;
+        }
+      }
+    }
+
+    function flashBtn(btn, ok){
+      if(!btn) return;
+      const original = btn.textContent;
+      btn.textContent = ok ? "복사됨!" : "복사 실패";
+      btn.classList.toggle("on", ok);
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove("on");
+      }, 900);
+    }
+
+    // ===== Mobile drawer controls =====
+    function isMobileLayout(){
+      return window.matchMedia("(max-width: 980px)").matches;
+    }
+
+    function setMobileEditorOpen(open){
+      state.editorOpenMobile = !!open;
+      editorPanel.classList.toggle("is-open", state.editorOpenMobile);
+      btnToggleEditor.textContent = state.editorOpenMobile ? "입력창 닫기" : "입력창 열기";
+    }
+
+    function syncMobileUI(){
+      const mobile = isMobileLayout();
+      drawerHandle.style.display = mobile ? "flex" : "none";
+      if(mobile){
+        editorPanel.classList.toggle("is-open", !!state.editorOpenMobile);
+      }else{
+        editorPanel.classList.remove("is-open");
+      }
+    }
+
+    // ===== UI Setters =====
+    function setMode(mode){
+      state.mode = mode;
+      frame.classList.toggle("pc", mode==="pc");
+      frame.classList.toggle("mo", mode==="mo");
+      btnPC.classList.toggle("on", mode==="pc");
+      btnMO.classList.toggle("on", mode==="mo");
+      frameLabel.textContent = mode==="pc" ? "PC Frame" : "MO Frame";
+    }
+
+    function setTab(tab){
+      // 현재 탭 draft 저장 (세션 메모리)
+      state.drafts[state.activeTab] = editor.value || "";
+
+      state.activeTab = tab;
+      tabs.forEach(t => t.classList.toggle("on", t.dataset.tab === tab));
+      editor.value = state.drafts[tab] || "";
+
+      const isChar = tab === "char";
+      // boxTitle.textContent = isChar ? "캐릭터 소개 (기본)" : "크리에이터 코멘트";
+      tabName.textContent = isChar ? "캐릭터 소개" : "크리에이터 코멘트";
+      limitLabel.textContent = formatNum(getLimitForTab(tab));
+
+      renderNow();
+    }
+
+    // ===== Sanitize =====
+    function sanitizeToTemp(html){
+      let warnings = [];
+
+      if (/<script\b/i.test(html)) warnings.push("script 제거됨");
+      const strippedScript = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+
+      const temp = document.createElement("div");
+      temp.innerHTML = strippedScript;
+
+      let removedOn = 0, removedJS = 0;
+      temp.querySelectorAll("*").forEach(el => {
+        [...el.attributes].forEach(attr => {
+          const name = attr.name.toLowerCase();
+          const value = (attr.value || "").trim();
+          if(name.startsWith("on")){
+            el.removeAttribute(attr.name);
+            removedOn++;
+          }
+          if((name === "href" || name === "src") && /^javascript:/i.test(value)){
+            el.removeAttribute(attr.name);
+            removedJS++;
+          }
+        });
+      });
+      if(removedOn) warnings.push(`on* 속성 ${removedOn}개 제거`);
+      if(removedJS) warnings.push(`javascript: ${removedJS}개 제거`);
+
+      return { temp, warnings };
+    }
+
+    // ===== Tag mapping =====
+    function scanOpeningTags(html){
+      const re = /<!--[\s\S]*?-->|<!doctype[\s\S]*?>|<\/[a-zA-Z][\w:-]*\s*>|<([a-zA-Z][\w:-]*)(\s[^<>]*?)?>/gi;
+      const matches = [];
+      let m;
+      while((m = re.exec(html)) !== null){
+        const whole = m[0];
+        if(whole.startsWith("<!--") || whole.toLowerCase().startsWith("<!doctype")) continue;
+        if(whole.startsWith("</")) continue;
+        matches.push({ start: m.index, end: m.index + whole.length });
+      }
+      return matches;
+    }
+
+    function assignIdsAndBuildMap(html, temp){
+      const tagRanges = scanOpeningTags(html);
+      const elements = Array.from(temp.querySelectorAll("*"));
+      idToRange = new Map();
+
+      const n = Math.min(elements.length, tagRanges.length);
+      for(let i=0; i<n; i++){
+        const id = "n" + (i+1);
+        elements[i].setAttribute("data-src-id", id);
+        idToRange.set(id, tagRanges[i]);
+      }
+    }
+
+    function focusEditorToRange(range){
+      if(!range) return;
+
+      if(isMobileLayout()){
+        setMobileEditorOpen(true);
+      }
+
+      editor.focus();
+      try { editor.setSelectionRange(range.start, range.end); } catch(e){}
+
+      const len = Math.max(editor.value.length, 1);
+      const ratio = range.start / len;
+
+      const cs = getComputedStyle(editor);
+      const lineHeight = parseFloat(cs.lineHeight) || (parseFloat(cs.fontSize) * 1.55) || 18;
+      const offsetPx = lineHeight * 6;
+
+      const applyScroll = () => {
+        const maxScroll = Math.max(0, editor.scrollHeight - editor.clientHeight);
+        const target = maxScroll * ratio;
+        editor.scrollTop = Math.max(0, target - offsetPx);
+      };
+
+      applyScroll();
+      requestAnimationFrame(() => {
+        applyScroll();
+        setTimeout(applyScroll, 60);
+      });
+    }
+
+    // ===== Render =====
+    function updateCounters(html){
+      const lim = getLimitForTab(state.activeTab);
+      const htmlLen = html.length;
+
+      cntHtml.textContent = formatNum(htmlLen);
+
+      const ratio = lim ? (htmlLen / lim) : 0;
+      if(htmlLen > lim) pillLimit.className = "pill bad";
+      else if(ratio >= 0.9) pillLimit.className = "pill warn";
+      else pillLimit.className = "pill good";
+    }
+
+    function renderNow(){
+      const html = editor.value || "";
+
+      // 세션 메모리에만 draft 저장
+      state.drafts[state.activeTab] = html;
+
+      updateCounters(html);
+      const { temp, warnings } = sanitizeToTemp(html);
+      assignIdsAndBuildMap(html, temp);
+
+      warn.textContent = warnings.length ? ("⚠️ " + warnings.join(" · ")) : "";
+
+      slot.innerHTML = "";
+      if(temp.innerHTML.trim()){
+        slot.append(...temp.childNodes);
+      }
+    }
+
+    // ===== Live preview binding =====
+    function bindEditorEvents(){
+      const evs = ["input","keyup","change","paste","cut","drop","compositionstart","compositionupdate","compositionend"];
+      evs.forEach(ev => {
+        editor.addEventListener(ev, () => {
+          if(ev === "paste") setTimeout(renderNow, 0);
+          renderNow();
+        });
+      });
+    }
+
+    // ===== Preview click -> focus editor =====
+    function bindPreviewClick(){
+      previewRoot.addEventListener("click", (e) => {
+        const el = e.target.closest("[data-src-id]");
+        if(!el) return;
+        const id = el.getAttribute("data-src-id");
+        const range = idToRange.get(id);
+        focusEditorToRange(range);
+      }, { passive: true });
+    }
+
+    // ===== Buttons =====
+    btnCopyPC.addEventListener("click", async () => {
+      const ok = await copyAllToClipboard();
+      flashBtn(btnCopyPC, ok);
+    });
+
+    btnCopyMobile.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const ok = await copyAllToClipboard();
+      flashBtn(btnCopyMobile, ok);
+    });
+
+    btnPC.addEventListener("click", () => setMode("pc"));
+    btnMO.addEventListener("click", () => setMode("mo"));
+
+    btnClear.addEventListener("click", () => {
+      editor.value = "";
+      state.drafts[state.activeTab] = "";
+      renderNow();
+    });
+
+    tabs.forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
+
+    btnToggleEditor.addEventListener("click", () => setMobileEditorOpen(!state.editorOpenMobile));
+    drawerHandle.addEventListener("click", (e) => {
+      if(e.target === btnToggleEditor || e.target === btnCopyMobile) return;
+      setMobileEditorOpen(!state.editorOpenMobile);
+    });
+
+    // ===== Init =====
+    bindEditorEvents();
+    bindPreviewClick();
+
+    setMode(state.mode || "pc");
+    setTab(state.activeTab || "char");
+
+    syncMobileUI();
+    window.addEventListener("resize", () => {
+      syncMobileUI();
+      if(!isMobileLayout()) state.editorOpenMobile = false;
+    });
+
+    if(isMobileLayout()){
+      setMobileEditorOpen(!!state.editorOpenMobile);
+    }
+
+    renderNow();
+  </script>
+</body>
+</html>
