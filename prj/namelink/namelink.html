@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NAME LINK</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel: rgba(15,23,42,.65);
+      --card: rgba(17,25,55,.65);
+      --line: rgba(148,163,184,.18);
+      --txt:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#7c3aed;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+  
+    *{box-sizing:border-box}
+  
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 700px at 10% -10%, rgba(124,58,237,.22), transparent 60%),
+        radial-gradient(900px 560px at 92% 0%, rgba(34,197,94,.18), transparent 55%),
+        radial-gradient(700px 520px at 30% 110%, rgba(59,130,246,.18), transparent 60%),
+        var(--bg);
+      color:var(--txt);
+    }
+  
+    .wrap{max-width:1100px;margin:0 auto;padding:20px 14px 44px; min-height: 100vh;}
+    header{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
+  
+    /* === 상단 타이틀을 로고 이미지로 교체 (HTML 수정 없이) === */
+    .title {width: 100%;}
+    .title h1{
+      margin:0;
+      font-size:0;
+      line-height:0;
+      height:150px;
+      position: relative;
+    }
+    .title h1::before{
+      content:"";
+      display:block;
+      width: 330px;
+      height: 150px;
+      background: url("https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/909546cb-2f7f-426c-b945-68ee4c628d86?v=be7406") center/contain no-repeat;
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,.65));
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  
+    .title p{margin:6px 0 0 0;color:var(--muted);font-size:13px;line-height:1.35}
+  
+    .controls{
+      width:100%;
+      background: rgba(15,23,42,.72);
+      border:1px solid rgba(148,163,184,.16);
+      border-radius: var(--radius);
+      padding:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      position:relative;
+      overflow:hidden;
+      backdrop-filter: blur(18px) saturate(1.15);
+    }
+    .controls::before{
+      content:"";
+      position:absolute;
+      inset:-40% -30%;
+      background:
+        radial-gradient(620px 240px at 18% 50%, rgba(124,58,237,.22), transparent 60%),
+        radial-gradient(540px 230px at 72% 40%, rgba(34,197,94,.16), transparent 60%);
+      pointer-events:none;
+      opacity:.7;
+    }
+    .controls > *{position:relative}
+  
+    .group{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  
+    .chip{
+      display:flex;align-items:center;gap:8px;
+      padding:8px 10px;
+      border:1px solid rgba(148,163,184,.18);
+      border-radius:999px;
+      background:rgba(15,23,42,.65);
+      user-select:none;
+      backdrop-filter: blur(14px) saturate(1.15);
+    }
+    .chip input{width:16px;height:16px;accent-color:var(--accent)}
+    .chip b{font-size:13px}
+    .chip small{font-size:12px;color:var(--muted)}
+  
+    select, button, input[type="search"]{
+      background: rgba(15,23,42,.65);
+      color: var(--txt);
+      border:1px solid rgba(148,163,184,.18);
+      border-radius: 12px;
+      padding:10px 12px;
+      font-size:13px;
+      outline:none;
+      backdrop-filter: blur(14px) saturate(1.15);
+    }
+    input[type="search"]{flex: 1 1 220px; min-width: 190px}
+    input[type="search"]::placeholder{color: rgba(148,163,184,.6)}
+    input[type="search"]:focus{
+      border-color: rgba(124,58,237,.6);
+      box-shadow: 0 0 0 4px rgba(124,58,237,.18);
+    }
+  
+    button{cursor:pointer}
+    button:hover{border-color: rgba(124,58,237,.55)}
+    button:disabled{opacity:.35; cursor:not-allowed}
+  
+    .spacer{flex:1 1 auto}
+  
+    .metaLine{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px;width:100%}
+    /* .metaPill{
+      padding:6px 10px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:999px;
+      background:rgba(255,255,255,.55);
+      backdrop-filter: blur(14px) saturate(1.2);
+    } */
+    .metaPill:nth-child(2) {display: none;}
+  
+    .grid{
+      margin-top:14px;
+      display:grid;
+      gap:12px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns: repeat(4, minmax(0, 1fr));} }
+    @media (max-width: 720px){ .grid{grid-template-columns: repeat(3, minmax(0, 1fr));} }
+    @media (max-width: 420px){ .grid{grid-template-columns: repeat(2, minmax(0, 1fr));} }
+  
+    .card{
+      border:1px solid rgba(148,163,184,.18);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(17,25,55,.85), rgba(11,18,32,.75));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      transition: transform .12s ease, border-color .12s ease;
+      will-change: transform, opacity;
+      backdrop-filter: blur(16px) saturate(1.1);
+    }
+    .card:hover{transform: translateY(-2px); border-color: rgba(148,163,184,.32)}
+    .link{display:block;color:inherit;text-decoration:none;height:100%}
+  
+    .thumb{
+      aspect-ratio: 2.3/3;
+      width:100%;
+      background: #070b16;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .thumb img{
+      width:100%; height:100%;
+      object-fit:cover;
+      display:block;
+      object-position: top;
+      filter: saturate(1.05) contrast(1.05);
+      transform: scale(1.02);
+    }
+
+    /* [ADDED] 썸네일 모드 토글(스위치) 스타일 */
+    .toggleWrap{display:flex;align-items:center;gap:10px}
+    .toggleLabel{font-size:12px;color:var(--muted);user-select:none;white-space:nowrap}
+    .switch{
+      width: 54px; height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.22);
+      background: rgba(15,23,42,.65);
+      position: relative;
+      cursor: pointer;
+      padding: 0;
+      outline: none;
+      backdrop-filter: blur(14px) saturate(1.15);
+    }
+    .switch::before{
+      content:"";
+      position:absolute;
+      opacity: 0.5;
+      top: 50%;
+      left: 6px;
+      width: 22px; height: 22px;
+      transform: translateY(-50%);
+      border-radius: 999px;
+      background: rgba(229,231,235,.92);
+      box-shadow: 0 10px 18px rgba(0,0,0,.35);
+      transition: transform .18s cubic-bezier(.2,.8,.2,1), background .18s ease;
+    }
+    .switch[data-on="true"]{
+      border-color: rgba(124,58,237,.55);
+      box-shadow: 0 0 0 4px rgba(124,58,237,.16);
+    }
+    .switch[data-on="true"]::before{
+      transform: translate(20px, -50%);
+      background: rgba(124,58,237,.9);
+    }
+    .switchText{
+      font-size:12px;
+      color: rgba(229,231,235,.9);
+      padding: 0 10px;
+      user-select:none;
+      white-space:nowrap;
+    }
+  
+    .badgeRow{
+      position:absolute; left:10px; top:10px;
+      display:flex; gap:6px; flex-wrap:wrap;
+    }
+    .badge{
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.22);
+      background: rgba(15,23,42,.75);
+      color: rgba(229,231,235,.9);
+      backdrop-filter: blur(12px) saturate(1.1);
+    }
+    .badge.hero{border-color: rgba(34,197,94,.45)}
+    .badge.villain{border-color: rgba(239,68,68,.45)}
+    .badge.grade{border-color: rgba(124,58,237,.45)}
+  
+    .body{
+      padding:12px 12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+  
+    .codename{
+      font-weight:900;
+      letter-spacing:-.2px;
+      line-height:1.1;
+      font-size:14px;
+      word-break:keep-all;
+    }
+  
+    .sub{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .sub strong{color:var(--txt); font-weight:800}
+  
+    .mini{
+      padding:4px 8px;
+      border-radius:999px;
+      backdrop-filter: blur(14px) saturate(1.1);
+      border:1px solid rgba(148,163,184,.22);
+    }
+    .mini.hero {border-color: rgba(69,125,255,.6)}
+    .mini.villain {border-color: rgba(255,0,0,.55)}
+  
+    .hl{
+      background: linear-gradient(180deg, rgba(124,58,237,.0) 35%, rgba(124,58,237,.35) 35%, rgba(124,58,237,.35) 88%, rgba(124,58,237,.0) 88%);
+      color: var(--txt);
+      padding:0 .08em;
+      border-radius:6px;
+    }
+  
+    .empty{
+      margin-top:14px;
+      border:1px dashed rgba(148,163,184,.25);
+      border-radius: var(--radius);
+      padding:16px;
+      color: var(--muted);
+      text-align:center;
+      background: rgba(15,23,42,.65);
+      backdrop-filter: blur(14px) saturate(1.1);
+    }
+    .empty b{color:var(--txt)}
+  
+    .by{
+      font-size: 13px;
+      margin-top: 20px;
+      opacity: 0.35;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* [ADDED] 접근성 숨김(기존 select 유지용) */
+    .srOnly{
+    position:absolute !important;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0,0,0,0);
+    white-space:nowrap;border:0;
+    }
+
+    /* [ADDED] 정렬 토글 버튼 UI */
+    .segBtn{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 12px;
+    border:1px solid rgba(148,163,184,.18);
+    border-radius: 12px;
+    background: rgba(15,23,42,.65);
+    color: var(--txt);
+    backdrop-filter: blur(14px) saturate(1.15);
+    cursor:pointer;
+    }
+    .segBtn:hover{ border-color: rgba(124,58,237,.55); }
+    .segBtn:active{ transform: translateY(1px); }
+    .segTag{
+    font-size:11px;
+    color: rgba(148,163,184,.85);
+    padding:3px 8px;
+    border-radius: 999px;
+    border:1px solid rgba(148,163,184,.18);
+    background: rgba(0,0,0,.18);
+    }
+    .segBtn b{ font-size:13px; letter-spacing:-.2px; }
+    #resetBtn {padding: 11px 15px;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>캐릭터 목록</h1>
+      </div>
+    </header>
+
+    <div class="controls" id="controls">
+      <div class="group">
+        <label class="chip"><input type="checkbox" id="filterHero" checked><b>히어로</b><small>Hero</small></label>
+        <label class="chip"><input type="checkbox" id="filterVillain" checked><b>빌런</b><small>Villain</small></label>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="group toggleWrap">
+        <!-- [ADDED] 썸네일 모드 토글 -->
+        <span class="toggleLabel">썸네일</span>
+        <button type="button" class="switch" id="thumbModeBtn" data-on="false" aria-label="썸네일 모드 전환">
+          <span class="switchText" id="thumbModeText">메인</span>
+        </button>
+      </div>
+
+      <div class="group" style="flex: 1 1 320px;">
+        <input id="searchInput" type="search" placeholder="코드네임으로 검색…" autocomplete="off" />
+        <button type="button" id="clearSearch" aria-label="검색어 지우기">✕</button>
+      </div>
+
+      <div class="group">
+        <!-- [ADDED] 정렬 토글 -->
+        <button type="button" id="sortKeyToggle" class="chip" aria-label="정렬 기준 토글">
+          <span class="segTag">정렬</span>
+          <b id="sortKeyText">등급순</b>
+        </button>
+      
+        <button type="button" id="sortDirToggle" class="chip" aria-label="정렬 방향 토글">
+          <span class="segTag">방향</span>
+          <b id="sortDirText">오름차</b>
+        </button>
+      
+        <!-- 기존 select는 JS 호환용으로 숨겨두기(유지보수 편함) -->
+        <select id="sortKey" aria-label="정렬 기준" class="srOnly">
+          <option value="grade">등급순</option>
+          <option value="name">이름순</option>
+        </select>
+        <select id="sortDir" aria-label="정렬 방향" class="srOnly">
+          <option value="asc">오름차</option>
+          <option value="desc">내림차</option>
+        </select>
+      
+        <button type="button" id="resetBtn" class="chip">초기화</button>
+      </div>
+      
+
+      <div class="metaLine">
+        <span class="metaPill">표시: <b id="countNow">0</b> / <span id="countAll">0</span></span>
+        <span class="metaPill ">정렬: <b id="sortLabel">등급순 · 오름차</b></span>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none;">조건에 맞는 캐릭터가 없어 😭 <b>체크박스</b>나 <b>검색어</b>를 바꿔봐!</div>
+    <div class="by">
+      Webpage made by. 𝕏 @Olli_mine
+    </div>
+  </div>
+
+  <script>
+    // ===== 예시 데이터(여기만 네 세계관 캐릭터로 교체하면 됨) =====
+    // [ADDED] thumbId(증명사진) 필드 추가 지원!
+    const characters = [
+      { id:"segye", codename:"SEGYE", position:"villain", grade:"SS",
+        thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/0a49bfad-72b8-4d1f-99fa-f538c3695e36?v=2b762f",
+        thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/3a33623f-a3fa-4b00-af45-4b6a41575018?v=c51e11",
+        link:"https://caveduck.io/character-info/d9a5cbce-81d9-41c7-99d5-491f442c9bef?locale=ko"
+      },
+      { id:"pawn", codename:"PAWN", position:"villain", grade:"SS",
+        thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/ce1780f7-b1d5-449d-839c-4ab85ae0a7d9?v=9da22e",
+        thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/26143cc5-6914-4400-88b3-8346bfac522b?v=55407b",
+        link:"https://caveduck.io/character-info/98bdb403-5e65-4fdb-b000-72586bc74c1b?locale=ko"
+      },
+      { id:"cheat", codename:"CHEAT", position:"villain", grade:"S",
+        thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a0ade898-2418-4600-97f0-2bcacee69442?v=a8522f",
+        thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/2c2b737d-e4bc-43e9-bd13-b05c44b47677?v=224952",
+        link:"https://caveduck.io/character-info/b9306c5a-58af-42d2-9345-f19332b71a6a?locale=ko"
+      },
+      { id:"taser", codename:"TASER", position:"hero", grade:"S",
+        thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/61cc164e-dd55-489a-b5dd-5ade20ace30a?v=eb676a",
+        thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/79260c15-bf1d-4a1b-a844-2d0eb362ae68?v=e9df21",
+        link:"https://caveduck.io/character-info/0412c19b-7346-46b2-9a35-fa973d07441c?locale=ko"
+      },
+      { id:"ise", codename:"ISE", position:"hero", grade:"S",
+        thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/70d9f1aa-53ea-4b53-8e92-e6d05f18a845?v=96967e",
+        thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/bf39d591-05a6-4d1c-b31a-342460e098bd?v=0844b8",
+        link:"https://caveduck.io/character-info/d631031e-7baf-44e4-b91b-48b7dc298517?locale=ko"
+      },
+      { id:"zeno", codename:"ZENO", position:"hero", grade:"S",
+        thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/6fd77199-3a9d-4d0b-8247-876a3e494b0b?v=73b7b0",
+        thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a8d4a931-f9ea-450d-b5ce-76d8bb5af655?v=583ed5",
+        link:"https://caveduck.io/character-info/4f288a42-afe3-472f-b7c2-a493b2f7c4f3?locale=ko"
+      },
+    ];
+
+    // 등급 우선순위(원하면 수정)
+    const gradeRank = { "SS": 7, "S": 6, "A": 5, "B": 4, "C": 3, "D": 2, "F": 1 };
+
+    const $ = (s) => document.querySelector(s);
+    const grid = $("#grid");
+    const empty = $("#empty");
+    const filterHero = $("#filterHero");
+    const filterVillain = $("#filterVillain");
+    const searchInput = $("#searchInput");
+    const clearSearch = $("#clearSearch");
+    const sortKey = $("#sortKey");
+    // [ADDED] 정렬 토글 버튼
+const sortKeyToggle = $("#sortKeyToggle");
+const sortDirToggle = $("#sortDirToggle");
+const sortKeyText = $("#sortKeyText");
+const sortDirText = $("#sortDirText");
+
+function syncSortToggleUI(){
+  sortKeyText.textContent = (sortKey.value === "grade") ? "등급순" : "이름순";
+  sortDirText.textContent = (sortDir.value === "asc") ? "오름차" : "내림차";
+}
+
+    const sortDir = $("#sortDir");
+    const resetBtn = $("#resetBtn");
+    const countNow = $("#countNow");
+    const countAll = $("#countAll");
+    const sortLabel = $("#sortLabel");
+
+    // [ADDED] 토글 버튼 요소
+    const thumbModeBtn = $("#thumbModeBtn");
+    const thumbModeText = $("#thumbModeText");
+
+    countAll.textContent = characters.length;
+
+    const state = {
+      prevKeys: new Set(),
+      animating: false,
+      rafId: 0,
+      lastToken: 0,
+      // [ADDED] 썸네일 모드: "main" | "id"
+      thumbMode: "main",
+    };
+
+    function normalize(v){ return (v ?? "").toString().trim().toLowerCase(); }
+    function badgeLabel(pos){ return pos === "hero" ? "히어로" : "빌런"; }
+
+    function highlight(text, q){
+      if (!q) return escapeHtml(text);
+      const t = text.toString();
+      const ti = t.toLowerCase();
+      const qi = q.toLowerCase();
+      const idx = ti.indexOf(qi);
+      if (idx < 0) return escapeHtml(t);
+      const a = escapeHtml(t.slice(0, idx));
+      const b = escapeHtml(t.slice(idx, idx + q.length));
+      const c = escapeHtml(t.slice(idx + q.length));
+      return `${a}<mark class="hl">${b}</mark>${c}`;
+    }
+
+    function escapeHtml(str){
+      return str.replace(/[&<>"']/g, (m) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+    }
+
+    function getList(){
+      const showHero = filterHero.checked;
+      const showVillain = filterVillain.checked;
+      const q = normalize(searchInput.value);
+
+      const filtered = characters.filter(c => {
+        const okPos = (c.position === "hero" && showHero) || (c.position === "villain" && showVillain);
+        if (!okPos) return false;
+        if (!q) return true;
+        return normalize(c.codename).includes(q);
+      });
+
+      const key = sortKey.value; // grade | name
+      const dir = sortDir.value; // asc | desc
+      const factor = dir === "asc" ? 1 : -1;
+
+      const sorted = [...filtered].sort((a,b) => {
+        if (key === "grade"){
+          const ra = gradeRank[a.grade] ?? 0;
+          const rb = gradeRank[b.grade] ?? 0;
+          const diff = (ra - rb) * factor;
+          if (diff !== 0) return diff;
+          return normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
+        } else {
+          const diff = normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
+          if (diff !== 0) return diff;
+          return ((gradeRank[a.grade] ?? 0) - (gradeRank[b.grade] ?? 0)) * factor;
+        }
+      });
+
+      return sorted;
+    }
+
+    function snapshotPositions(){
+      const map = new Map();
+      grid.querySelectorAll(".card").forEach(el => {
+        map.set(el.dataset.key, el.getBoundingClientRect());
+      });
+      return map;
+    }
+
+    function animateFlip(beforeRects){
+      const cards = [...grid.querySelectorAll(".card")];
+      cards.forEach((el, i) => {
+        const key = el.dataset.key;
+        const first = beforeRects.get(key);
+        const last = el.getBoundingClientRect();
+        if (!first) return;
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+        if (dx || dy){
+          el.animate(
+            [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0,0)" }],
+            { duration: 260, delay: i*10, easing: "cubic-bezier(.2,.8,.2,1)" }
+          );
+        }
+      });
+    }
+
+    // 교차 OUT: 왼쪽/위로 빠짐, IN: 오른쪽/아래서 들어옴
+    function animateOut(els){
+      els.forEach((el, i) => {
+        el.style.pointerEvents = "none";
+        el.animate(
+          [
+            { opacity: 1, transform: "translate(0,0) scale(1)", filter: "blur(0px)" },
+            { opacity: 0, transform: "translate(-14px,-10px) scale(.985)", filter: "blur(0.8px)" }
+          ],
+          { duration: 190, delay: i*12, easing: "cubic-bezier(.2,.8,.2,1)", fill:"forwards" }
+        );
+      });
+      return els.length ? 190 + (els.length-1)*12 : 0;
+    }
+
+    function animateIn(newKeys, oldKeys){
+      const cards = [...grid.querySelectorAll(".card")];
+      cards.forEach((el, i) => {
+        const key = el.dataset.key;
+        if (!oldKeys.has(key)){
+          el.animate(
+            [
+              { opacity: 0, transform: "translate(14px,10px) scale(1)", filter: "blur(0.8px)" },
+              { opacity: 1, transform: "translate(0,0) scale(1)", filter: "blur(0px)" }
+            ],
+            { duration: 230, delay: i*14, easing: "cubic-bezier(.2,.8,.2,1)" }
+          );
+        }
+      });
+    }
+
+    // [ADDED] 현재 썸네일 모드에 맞춰 이미지 URL 선택
+    function getThumbUrl(c){
+      if (state.thumbMode === "id"){
+        return c.thumbId || c.thumb; // 증명사진 없으면 메인으로 fallback
+      }
+      return c.thumb;
+    }
+
+    function renderFromList(list){
+      const q = searchInput.value.trim();
+      countNow.textContent = list.length;
+      const k = sortKey.value === "grade" ? "등급순" : "이름순";
+      const d = sortDir.value === "asc" ? "오름차" : "내림차";
+      sortLabel.textContent = `${k} · ${d}`;
+
+      grid.innerHTML = "";
+      if (list.length === 0){
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+
+      const frag = document.createDocumentFragment();
+      for (const c of list){
+        const card = document.createElement("article");
+        card.className = "card";
+        const key = c.id || c.codename;
+        card.dataset.key = key;
+
+        const imgSrc = getThumbUrl(c); // [ADDED]
+        card.innerHTML = `
+          <a class="link" target="_blank" href="${c.link || "#"}" aria-label="${escapeHtml(c.codename)} 상세 페이지로 이동">
+            <div class="thumb">
+              <img src="${imgSrc}" alt="${escapeHtml(c.codename)} 썸네일" loading="lazy" />
+              <!-- <div class="badgeRow">
+                <span class="badge ${c.position === "hero" ? "hero" : "villain"}">${badgeLabel(c.position)}</span>
+                <span class="badge grade">등급 ${escapeHtml(c.grade)}</span>
+              </div> -->
+            </div>
+            <div class="body">
+              <div class="codename">${highlight(c.codename, q)}</div>
+              <div class="sub">
+                <span class="mini ${c.position}"><strong>${badgeLabel(c.position)}</strong></span>
+                <span class="mini"><strong>${escapeHtml(c.grade)}</strong></span>
+              </div>
+            </div>
+          </a>
+        `;
+        frag.appendChild(card);
+      }
+      grid.appendChild(frag);
+    }
+
+    // 여러 이벤트가 연속으로 와도 애니메이션이 “꼬이지 않게” 토큰으로 보호
+    function renderWithCross(){
+      state.lastToken++;
+      const token = state.lastToken;
+
+      const beforeRects = snapshotPositions();
+      const oldKeys = new Set(state.prevKeys);
+
+      const nextList = getList();
+      const newKeys = new Set(nextList.map(c => c.id || c.codename));
+
+      const outKeys = [...oldKeys].filter(k => !newKeys.has(k));
+      const outEls = [...grid.querySelectorAll(".card")].filter(el => outKeys.includes(el.dataset.key));
+      const wait = animateOut(outEls);
+
+      clearTimeout(state.rafId);
+      state.rafId = setTimeout(() => {
+        if (token !== state.lastToken) return;
+
+        renderFromList(nextList);
+        animateFlip(beforeRects);
+        animateIn(newKeys, oldKeys);
+
+        state.prevKeys = newKeys;
+      }, wait);
+    }
+
+    // [ADDED] 토글 UI 갱신
+    function syncThumbToggleUI(){
+      const isId = state.thumbMode === "id";
+      thumbModeBtn.dataset.on = isId ? "true" : "false";
+      thumbModeText.textContent = isId ? "ID" : "MAIN";
+      thumbModeBtn.setAttribute("aria-label", isId ? "썸네일 모드: 증명사진" : "썸네일 모드: 메인이미지");
+    }
+
+    function init(){
+        
+      const first = getList();
+      renderFromList(first);
+      state.prevKeys = new Set(first.map(c => c.id || c.codename));
+
+      clearSearch.disabled = true;
+
+      const onChange = () => renderWithCross();
+      [filterHero, filterVillain, sortKey, sortDir].forEach(el => el.addEventListener("change", onChange));
+
+      searchInput.addEventListener("input", () => {
+        clearSearch.disabled = !searchInput.value;
+        renderWithCross();
+      });
+
+      clearSearch.addEventListener("click", () => {
+        searchInput.value = "";
+        clearSearch.disabled = true;
+        renderWithCross();
+        searchInput.focus();
+      });
+
+      resetBtn.addEventListener("click", () => {
+        filterHero.checked = true;
+        filterVillain.checked = true;
+        sortKey.value = "grade";
+        sortDir.value = "asc";
+        searchInput.value = "";
+        clearSearch.disabled = true;
+        // [ADDED] reset 시 썸네일 모드 메인으로
+        state.thumbMode = "main";
+        syncThumbToggleUI();
+        renderWithCross();
+        syncSortToggleUI();
+
+      });
+
+      // [ADDED] 썸네일 모드 토글 이벤트
+      thumbModeBtn.addEventListener("click", () => {
+        state.thumbMode = (state.thumbMode === "main") ? "id" : "main";
+        syncThumbToggleUI();
+        renderWithCross(); // 교차 애니메이션 그대로 적용
+      });
+
+      syncThumbToggleUI(); // 초기 UI 맞추기
+
+      // [ADDED] 정렬 토글 이벤트
+sortKeyToggle.addEventListener("click", () => {
+  sortKey.value = (sortKey.value === "grade") ? "name" : "grade";
+  syncSortToggleUI();
+  renderWithCross();
+});
+sortDirToggle.addEventListener("click", () => {
+  sortDir.value = (sortDir.value === "asc") ? "desc" : "asc";
+  syncSortToggleUI();
+  renderWithCross();
+});
+
+syncSortToggleUI();
+
+
+    }
+
+    init();
+  </script>
+</body>
+</html>
