@@ -84,7 +84,7 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding:10px 12px;
+      padding:0 12px;
       /* border-radius: 999px; */
       /* border: 1px solid rgba(148,163,184,.16); */
       background: rgba(15,23,42,.70);
@@ -117,11 +117,11 @@
       border-radius: 999px;
       transition: background .12s ease, transform .12s ease;
     }
-    .stickyLogoBtn:hover{background: rgba(124,58,237,.12);}
+    /* .stickyLogoBtn:hover{background: rgba(124,58,237,.12);} */
     .stickyLogoBtn:active{transform: translateY(1px);}
     .stickyLogo{
       width: 96px;
-      height: 26px;
+      height: 40px;
       background: url("https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/909546cb-2f7f-426c-b945-68ee4c628d86?v=be7406") center/contain no-repeat;
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
     }
@@ -424,10 +424,10 @@
       <!-- [ADDED] 스크롤 시 나타나는 상단 고정 헤더 -->
       <div class="stickyTop" id="stickyTop" aria-hidden="true">
         <div class="stickyBar">
-          <button type="button" class="stickyLogoBtn" id="stickyLogoBtn" aria-label="맨 위로 이동">
+          <div type="button" class="stickyLogoBtn" id="stickyLogoBtn" aria-label="맨 위로 이동">
             <span class="stickyLogo" aria-hidden="true"></span>
             <span class="stickyHint">Top</span>
-          </button>
+          </div>
           <div style="display: none !important;;gap:8px;align-items:center;color:rgba(148,163,184,.9);font-size:12px;white-space:nowrap;">
             <span>표시</span><b id="stickyCountNow">0</b><span>/</span><span id="stickyCountAll">0</span>
           </div>
