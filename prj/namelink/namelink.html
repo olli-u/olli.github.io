@@ -25,7 +25,12 @@
   margin:0;
   font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
   color:var(--txt);
-  background: transparent; 
+  background-attachment: fixed; 
+  background:
+    radial-gradient(1200px 700px at 10% -10%, rgba(124,58,237,.22), transparent 60%),
+    radial-gradient(900px 560px at 92% 0%, rgba(197, 34, 34, 0.18), transparent 55%),
+    radial-gradient(700px 520px at 30% 110%, rgba(59,130,246,.18), transparent 60%),
+    var(--bg);
 }
 
 body::before{
