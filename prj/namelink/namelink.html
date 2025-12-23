@@ -22,15 +22,26 @@
     *{box-sizing:border-box}
 
     body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 700px at 10% -10%, rgba(124,58,237,.22), transparent 60%),
-        radial-gradient(900px 560px at 92% 0%, rgba(197, 34, 34, 0.18), transparent 55%),
-        radial-gradient(700px 520px at 30% 110%, rgba(59,130,246,.18), transparent 60%),
-        var(--bg);
-      color:var(--txt);
-    }
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--txt);
+  background: transparent; 
+}
+
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* 컨텐츠 뒤로 */
+  pointer-events: none;
+
+  background:
+    radial-gradient(1200px 700px at 10% -10%, rgba(124,58,237,.22), transparent 60%),
+    radial-gradient(900px 560px at 92% 0%, rgba(197, 34, 34, 0.18), transparent 55%),
+    radial-gradient(700px 520px at 30% 110%, rgba(59,130,246,.18), transparent 60%),
+    var(--bg);
+}
+
 
     .wrap{max-width:1100px;margin:0 auto;padding:20px 14px 44px; min-height: 100vh;}
     header{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
@@ -159,7 +170,7 @@
     .card{
       border:1px solid rgba(148,163,184,.18);
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(17,25,55,.85), rgba(11,18,32,.75));
+      /* background: linear-gradient(180deg, rgba(17,25,55,.85), rgba(11,18,32,.75)); */
       box-shadow: var(--shadow);
       overflow:hidden;
       transition: transform .12s ease, border-color .12s ease;
