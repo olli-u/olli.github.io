@@ -324,8 +324,12 @@
       <!-- Mobile drawer handle -->
       <div class="drawerHandle" id="drawerHandle">
         <button class="btn" id="btnCopyMobile">전체 복사</button>
-        <button class="btn on" id="btnToggleEditor">입력창 열기</button>
+        <div>
+          <button class="btn" id="btnClearMobile">지우기</button>
+        <button class="btn on" id="btnToggleEditor">입력창 열기</button> 
+        </div>
       </div>
+      
 
       <div class="topbar">
         <div class="brand">
@@ -410,6 +414,7 @@
     const btnPC = document.getElementById("btnPC");
     const btnMO = document.getElementById("btnMO");
     const btnClear = document.getElementById("btnClear");
+    const btnClearMobile = document.getElementById("btnClearMobile");
 
     const tabs = Array.from(document.querySelectorAll(".tab"));
     const frame = document.getElementById("frame");
@@ -684,11 +689,19 @@
       renderNow();
     });
 
+    btnClearMobile.addEventListener("click", (e) => {
+      e.stopPropagation();
+      editor.value = "";
+      state.drafts[state.activeTab] = "";
+      renderNow();
+    });
+
+
     tabs.forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
 
     btnToggleEditor.addEventListener("click", () => setMobileEditorOpen(!state.editorOpenMobile));
     drawerHandle.addEventListener("click", (e) => {
-      if(e.target === btnToggleEditor || e.target === btnCopyMobile) return;
+      if(e.target === btnToggleEditor || e.target === btnCopyMobile || e.target === btnClearMobile) return;
       setMobileEditorOpen(!state.editorOpenMobile);
     });
 
