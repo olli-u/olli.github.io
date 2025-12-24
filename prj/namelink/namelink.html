@@ -262,6 +262,45 @@
       transform: scale(1.02);
     }
 
+    /* ===== [ADDED] Coming soon placeholder ===== */
+    .thumb.placeholder{
+      background: linear-gradient(135deg, rgba(124,58,237,.12), rgba(239,68,68,.10));
+    }
+    .thumb.placeholder::before{
+      content:"COMING...";
+      font-weight:900;
+      letter-spacing:.06em;
+      font-size:14px;
+      color: rgba(229,231,235,.85);
+      text-shadow: 0 10px 30px rgba(0,0,0,.45);
+      position: relative;
+      z-index: 2;
+    }
+    .thumb.placeholder::after{
+      content:"";
+      position:absolute;
+      inset:-60%;
+      background:
+        radial-gradient(520px 220px at 30% 50%, rgba(124,58,237,.25), transparent 60%),
+        radial-gradient(520px 220px at 70% 60%, rgba(59,130,246,.18), transparent 60%),
+        radial-gradient(520px 220px at 60% 30%, rgba(239,68,68,.14), transparent 60%);
+      opacity:.8;
+      filter: blur(12px);
+      animation: placeholderMove 2.2s ease-in-out infinite alternate;
+      pointer-events:none;
+    }
+    @keyframes placeholderMove{
+      from{ transform: translate(-10px,-6px) rotate(-2deg); }
+      to  { transform: translate(10px,6px) rotate(2deg); }
+    }
+
+    /* 배지에서 물음표가 예쁘게 보이게 */
+    .badge.unknown, .mini.unknown{
+      border-color: rgba(148,163,184,.35);
+      background: rgba(15,23,42,.65);
+      color: rgba(229,231,235,.85);
+    }
+
     .toggleWrap{display:flex;align-items:center;gap:10px}
     .toggleLabel{font-size:12px;color:var(--muted);user-select:none;white-space:nowrap}
     .switch{
@@ -500,10 +539,15 @@
     const characters = [
       { id:"segye", codename:"SEGYE", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/0a49bfad-72b8-4d1f-99fa-f538c3695e36?v=2b762f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/3a33623f-a3fa-4b00-af45-4b6a41575018?v=c51e11", link:"https://caveduck.io/character-info/d9a5cbce-81d9-41c7-99d5-491f442c9bef?locale=ko" },
       { id:"pawn", codename:"PAWN", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/ce1780f7-b1d5-449d-839c-4ab85ae0a7d9?v=9da22e", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/26143cc5-6914-4400-88b3-8346bfac522b?v=55407b", link:"https://caveduck.io/character-info/98bdb403-5e65-4fdb-b000-72586bc74c1b?locale=ko" },
-      { id:"cheat", codename:"CHEAT", position:"villain", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a0ade898-2418-4600-97f0-2bcacee69442?v=a8522f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/2c2b737d-e4bc-43e9-bd13-b05c44b47677?v=224952", link:"https://caveduck.io/character-info/b9306c5a-58af-42d2-9345-f19332b71a6a?locale=ko" },
+      { id:"cheat", codename:"CHEAT", position:"villain", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a0ade898-2418-4600-97f0-2bcacee69442?v=a8522f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/anim=true,dpr=2,f=auto,w=800/charim/97b6033a-d6c9-49c8-984c-8887c84f127d", link:"https://caveduck.io/character-info/b9306c5a-58af-42d2-9345-f19332b71a6a?locale=ko" },
       { id:"taser", codename:"TASER", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/61cc164e-dd55-489a-b5dd-5ade20ace30a?v=eb676a", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/79260c15-bf1d-4a1b-a844-2d0eb362ae68?v=e9df21", link:"https://caveduck.io/character-info/0412c19b-7346-46b2-9a35-fa973d07441c?locale=ko" },
       { id:"ise", codename:"ISE", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/70d9f1aa-53ea-4b53-8e92-e6d05f18a845?v=96967e", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/bf39d591-05a6-4d1c-b31a-342460e098bd?v=0844b8", link:"https://caveduck.io/character-info/d631031e-7baf-44e4-b91b-48b7dc298517?locale=ko" },
       { id:"zeno", codename:"ZENO", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/6fd77199-3a9d-4d0b-8247-876a3e494b0b?v=73b7b0", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a8d4a931-f9ea-450d-b5ce-76d8bb5af655?v=583ed5", link:"https://caveduck.io/character-info/4f288a42-afe3-472f-b7c2-a493b2f7c4f3?locale=ko" },
+      { id:"soon_hero1", codename:"?", position:"hero", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
+      { id:"soon_hero3", codename:"?", position:"hero", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
+      { id:"soon_hero2", codename:"?", position:"hero", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
+      { id:"soon_villain1", codename:"?", position:"villain", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
+      { id:"soon_villain2", codename:"?", position:"villain", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
     ];
 
     const gradeRank = { "SS": 7, "S": 6, "A": 5, "B": 4, "C": 3, "D": 2, "F": 1 };
@@ -595,18 +639,23 @@
       const factor = dir === "asc" ? 1 : -1;
 
       const sorted = [...filtered].sort((a,b) => {
-        if (key === "grade"){
-          const ra = gradeRank[a.grade] ?? 0;
-          const rb = gradeRank[b.grade] ?? 0;
-          const diff = (ra - rb) * factor;
-          if (diff !== 0) return diff;
-          return normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
-        } else {
-          const diff = normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
-          if (diff !== 0) return diff;
-          return ((gradeRank[a.grade] ?? 0) - (gradeRank[b.grade] ?? 0)) * factor;
-        }
-      });
+      const as = a.comingSoon ? 1 : 0;
+      const bs = b.comingSoon ? 1 : 0;
+      if (as !== bs) return as - bs;
+
+      if (key === "grade"){
+        const ra = gradeRank[a.grade] ?? 0;
+        const rb = gradeRank[b.grade] ?? 0;
+        const diff = (ra - rb) * factor;
+        if (diff !== 0) return diff;
+        return normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
+      } else {
+        const diff = normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
+        if (diff !== 0) return diff;
+        return ((gradeRank[a.grade] ?? 0) - (gradeRank[b.grade] ?? 0)) * factor;
+      }
+    });
+
 
       return sorted;
     }
@@ -701,22 +750,29 @@
         const key = c.id || c.codename;
         card.dataset.key = key;
 
-        const imgSrc = getThumbUrl(c);
+        const isSoon = !!c.comingSoon;
+const imgSrc = (!isSoon) ? getThumbUrl(c) : null;
 
-        card.innerHTML = `
-          <a class="link" target="_blank" href="${c.link || "#"}" aria-label="${escapeHtml(c.codename)} 상세 페이지로 이동">
-            <div class="thumb">
-              <img src="${imgSrc}" alt="${escapeHtml(c.codename)} 썸네일" loading="lazy" />
-            </div>
-            <div class="body">
-              <div class="codename">${highlight(c.codename, q)}</div>
-              <div class="sub">
-                <span class="mini ${c.position}"><strong>${badgeLabel(c.position)}</strong></span>
-                <span class="mini"><strong>${escapeHtml(c.grade)}</strong></span>
-              </div>
-            </div>
-          </a>
-        `;
+const thumbHtml = isSoon
+  ? `<div class="thumb placeholder" aria-label="출시 예정"></div>`
+  : `<div class="thumb"><img src="${imgSrc}" alt="${escapeHtml(c.codename)} 썸네일" loading="lazy" /></div>`;
+
+const safeLink = (c.link && c.link !== "#") ? c.link : "#";
+const linkAttrs = (safeLink === "#") ? `` : `target="_blank"`;
+
+card.innerHTML = `
+  <a class="link" ${linkAttrs} href="${safeLink}" aria-label="${escapeHtml(c.codename)} 상세 페이지로 이동">
+    ${thumbHtml}
+    <div class="body">
+      <div class="codename">${isSoon ? "?" : highlight(c.codename, q)}</div>
+      <div class="sub">
+        <span class="mini ${c.position}"><strong>${badgeLabel(c.position)}</strong></span>
+        <span class="mini ${isSoon ? "unknown" : ""}"><strong>${escapeHtml(c.grade)}</strong></span>
+      </div>
+    </div>
+  </a>
+`;
+
         frag.appendChild(card);
       }
       grid.appendChild(frag);
