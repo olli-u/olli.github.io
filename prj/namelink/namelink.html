@@ -59,16 +59,14 @@
     .title p{margin:6px 0 0 0;color:var(--muted);font-size:13px;line-height:1.35}
 
     /* =========================
-       [ADDED] Sticky mini header
+       Sticky mini header
        ========================= */
     .stickyTop{
       position: fixed;
       top: 0;
       left: 0%;
-      /* transform: translateX(-50%); */
       width: 100%;
       z-index: 9999;
-
       opacity: 0;
       pointer-events: none;
       translate: 0 -10px;
@@ -85,8 +83,6 @@
       justify-content:space-between;
       gap:10px;
       padding:0 12px;
-      /* border-radius: 999px; */
-      /* border: 1px solid rgba(148,163,184,.16); */
       background: rgba(15,23,42,.70);
       box-shadow: 0 22px 60px rgba(0,0,0,.50);
       backdrop-filter: blur(18px) saturate(1.15);
@@ -117,7 +113,6 @@
       border-radius: 999px;
       transition: background .12s ease, transform .12s ease;
     }
-    /* .stickyLogoBtn:hover{background: rgba(124,58,237,.12);} */
     .stickyLogoBtn:active{transform: translateY(1px);}
     .stickyLogo{
       width: 96px;
@@ -262,7 +257,7 @@
       transform: scale(1.02);
     }
 
-    /* ===== [ADDED] Coming soon placeholder ===== */
+    /* Coming soon placeholder */
     .thumb.placeholder{
       background: linear-gradient(135deg, rgba(124,58,237,.12), rgba(239,68,68,.10));
     }
@@ -294,7 +289,6 @@
       to  { transform: translate(10px,6px) rotate(2deg); }
     }
 
-    /* 배지에서 물음표가 예쁘게 보이게 */
     .badge.unknown, .mini.unknown{
       border-color: rgba(148,163,184,.35);
       background: rgba(15,23,42,.65);
@@ -460,15 +454,15 @@
 <body>
   <div class="wrap">
     <header>
-      <!-- [ADDED] 스크롤 시 나타나는 상단 고정 헤더 -->
+      <!-- Sticky header -->
       <div class="stickyTop" id="stickyTop" aria-hidden="true">
         <div class="stickyBar">
-          <div type="button" class="stickyLogoBtn" id="stickyLogoBtn" aria-label="맨 위로 이동">
+          <div type="button" class="stickyLogoBtn" id="stickyLogoBtn" aria-label="Scroll to top">
             <span class="stickyLogo" aria-hidden="true"></span>
             <span class="stickyHint"></span>
           </div>
           <div style="display: none !important;;gap:8px;align-items:center;color:rgba(148,163,184,.9);font-size:12px;white-space:nowrap;">
-            <span>표시</span><b id="stickyCountNow">0</b><span>/</span><span id="stickyCountAll">0</span>
+            <span>Shown</span><b id="stickyCountNow">0</b><span>/</span><span id="stickyCountAll">0</span>
           </div>
         </div>
       </div>
@@ -480,62 +474,110 @@
 
     <div class="controls" id="controls">
       <div class="group">
-        <label class="chip"><input type="checkbox" id="filterHero" checked><b>히어로</b></label>
-        <label class="chip"><input type="checkbox" id="filterVillain" checked><b>빌런</b></label>
+        <label class="chip"><input type="checkbox" id="filterHero" checked><b>Hero</b></label>
+        <label class="chip"><input type="checkbox" id="filterVillain" checked><b>Villain</b></label>
       </div>
 
       <div class="spacer"></div>
 
       <div class="group toggleWrap">
-        <span class="toggleLabel">썸네일</span>
-        <button type="button" class="switch" id="thumbModeBtn" data-on="false" aria-label="썸네일 모드 전환">
-          <span class="switchText" id="thumbModeText">메인</span>
+        <span class="toggleLabel">Thumbnail</span>
+        <button type="button" class="switch" id="thumbModeBtn" data-on="false" aria-label="Toggle thumbnail mode">
+          <span class="switchText" id="thumbModeText">MAIN</span>
         </button>
       </div>
 
       <div class="group searchGroup">
-        <input id="searchInput" type="search" placeholder="코드네임으로 검색…" autocomplete="off" />
-        <button type="button" id="clearSearch" aria-label="검색어 지우기">✕</button>
+        <input id="searchInput" type="search" placeholder="Search by codename…" autocomplete="off" />
+        <button type="button" id="clearSearch" aria-label="Clear search query">✕</button>
       </div>
 
       <div class="group">
-        <button type="button" id="sortKeyToggle" class="chip" aria-label="정렬 기준 토글">
-          <span class="segTag">정렬</span>
-          <b id="sortKeyText">등급순</b>
+        <button type="button" id="sortKeyToggle" class="chip" aria-label="Toggle sort key">
+          <span class="segTag">Sort</span>
+          <b id="sortKeyText">By Rank</b>
         </button>
-        <button type="button" id="sortDirToggle" class="chip" aria-label="정렬 방향 토글">
-          <span class="segTag">방향</span>
-          <b id="sortDirText">오름차</b>
+        <button type="button" id="sortDirToggle" class="chip" aria-label="Toggle sort direction">
+          <span class="segTag">Order</span>
+          <b id="sortDirText">Ascending</b>
         </button>
 
-        <select id="sortKey" aria-label="정렬 기준" class="srOnly">
-          <option value="grade">등급순</option>
-          <option value="name">이름순</option>
+        <select id="sortKey" aria-label="Sort key" class="srOnly">
+          <option value="grade">By Rank</option>
+          <option value="name">By Name</option>
         </select>
-        <select id="sortDir" aria-label="정렬 방향" class="srOnly">
-          <option value="asc">오름차</option>
-          <option value="desc">내림차</option>
+        <select id="sortDir" aria-label="Sort direction" class="srOnly">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
         </select>
 
-        <button type="button" id="resetBtn" class="chip">초기화</button>
+        <button type="button" id="resetBtn" class="chip">Reset</button>
       </div>
 
       <div class="metaLine">
-        <span class="metaPill">표시: <b id="countNow">0</b> / <span id="countAll">0</span></span>
-        <span class="metaPill ">정렬: <b id="sortLabel">등급순 · 오름차</b></span>
+        <span class="metaPill"><span class="metaLabelShown">Shown: </span><b id="countNow">0</b> / <span id="countAll">0</span></span>
+        <span class="metaPill"><span class="metaLabelSort">Sort: </span><b id="sortLabel">By Rank · Ascending</b></span>
       </div>
     </div>
 
     <div class="grid" id="grid"></div>
 
     <div class="empty" id="empty" style="display:none;">
-      조건에 맞는 캐릭터가 없어 😭 <b>체크박스</b>나 <b>검색어</b>를 바꿔봐!
+      No characters match the current filters 😭 <b>Check the filter</b> or <b>search term</b>!
     </div>
 
     <div class="by"> Webpage made by. 𝕏 @Olli_mine </div>
   </div>
 
   <script>
+    // 언어 감지 & 텍스트 세팅
+    const htmlLang = (document.documentElement.lang || "").toLowerCase();
+    const isKo = htmlLang.startsWith("ko");
+
+    const TEXT = isKo ? {
+      hero: "히어로",
+      villain: "빌런",
+      thumbnail: "썸네일",
+      thumbMain: "메인",
+      thumbId: "ID",
+      searchPlaceholder: "코드네임으로 검색…",
+      sortTag: "정렬",
+      orderTag: "방향",
+      sortByRank: "등급순",
+      sortByName: "이름순",
+      asc: "오름차",
+      desc: "내림차",
+      reset: "초기화",
+      shownPrefix: "표시: ",
+      sortPrefix: "정렬: ",
+      emptyHtml: '조건에 맞는 캐릭터가 없어 😭 <b>체크박스</b>나 <b>검색어</b>를 바꿔봐!',
+      comingSoonAria: "출시 예정",
+      thumbnailAltSuffix: " 썸네일",
+      detailAriaSuffix: " 상세 페이지로 이동",
+      stickyScrollTop: "맨 위로 이동"
+    } : {
+      hero: "Hero",
+      villain: "Villain",
+      thumbnail: "Thumbnail",
+      thumbMain: "MAIN",
+      thumbId: "ID",
+      searchPlaceholder: "Search by codename…",
+      sortTag: "Sort",
+      orderTag: "Order",
+      sortByRank: "By Rank",
+      sortByName: "By Name",
+      asc: "Ascending",
+      desc: "Descending",
+      reset: "Reset",
+      shownPrefix: "Shown: ",
+      sortPrefix: "Sort: ",
+      emptyHtml: 'No characters match the current filters 😭 <b>Check the filter</b> or <b>search term</b>!',
+      comingSoonAria: "Coming soon",
+      thumbnailAltSuffix: " thumbnail",
+      detailAriaSuffix: " detail page",
+      stickyScrollTop: "Scroll to top"
+    };
+
     const characters = [
       { id:"segye", codename:"SEGYE", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/0a49bfad-72b8-4d1f-99fa-f538c3695e36?v=2b762f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/3a33623f-a3fa-4b00-af45-4b6a41575018?v=c51e11", link:"https://caveduck.io/character-info/d9a5cbce-81d9-41c7-99d5-491f442c9bef?locale=ko" },
       { id:"pawn", codename:"PAWN", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/ce1780f7-b1d5-449d-839c-4ab85ae0a7d9?v=9da22e", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/26143cc5-6914-4400-88b3-8346bfac522b?v=55407b", link:"https://caveduck.io/character-info/98bdb403-5e65-4fdb-b000-72586bc74c1b?locale=ko" },
@@ -577,15 +619,50 @@
     const thumbModeBtn = $("#thumbModeBtn");
     const thumbModeText = $("#thumbModeText");
 
-    // [ADDED] sticky header elements
     const stickyTop = $("#stickyTop");
     const stickyLogoBtn = $("#stickyLogoBtn");
     const stickyCountNow = $("#stickyCountNow");
     const stickyCountAll = $("#stickyCountAll");
 
+    const toggleLabelEl = document.querySelector(".toggleLabel");
+    const metaLabelShown = document.querySelector(".metaLabelShown");
+    const metaLabelSort = document.querySelector(".metaLabelSort");
+    const segTags = document.querySelectorAll(".segTag");
+
+    function applyLanguageStaticTexts(){
+      // 필터 라벨
+      filterHero.parentElement.querySelector("b").textContent = TEXT.hero;
+      filterVillain.parentElement.querySelector("b").textContent = TEXT.villain;
+
+      // 썸네일 토글 라벨
+      toggleLabelEl.textContent = TEXT.thumbnail;
+      thumbModeText.textContent = TEXT.thumbMain;
+
+      // 검색 placeholder
+      searchInput.placeholder = TEXT.searchPlaceholder;
+      clearSearch.setAttribute("aria-label", isKo ? "검색어 지우기" : "Clear search query");
+
+      // 정렬/방향 태그
+      if (segTags[0]) segTags[0].textContent = TEXT.sortTag;
+      if (segTags[1]) segTags[1].textContent = TEXT.orderTag;
+
+      // 리셋 버튼
+      resetBtn.textContent = TEXT.reset;
+
+      // 메타 라벨
+      metaLabelShown.textContent = TEXT.shownPrefix;
+      metaLabelSort.textContent = TEXT.sortPrefix;
+
+      // 빈 상태 메시지
+      empty.innerHTML = TEXT.emptyHtml;
+
+      // sticky 헤더 aria
+      stickyLogoBtn.setAttribute("aria-label", TEXT.stickyScrollTop);
+    }
+
     function syncSortToggleUI(){
-      sortKeyText.textContent = (sortKey.value === "grade") ? "등급순" : "이름순";
-      sortDirText.textContent = (sortDir.value === "asc") ? "오름차" : "내림차";
+      sortKeyText.textContent = (sortKey.value === "grade") ? TEXT.sortByRank : TEXT.sortByName;
+      sortDirText.textContent = (sortDir.value === "asc") ? TEXT.asc : TEXT.desc;
     }
 
     countAll.textContent = characters.length;
@@ -596,12 +673,11 @@
       rafId: 0,
       lastToken: 0,
       thumbMode: "main",
-      // [ADDED] sticky show threshold
       stickyShown: false,
     };
 
     function normalize(v){ return (v ?? "").toString().trim().toLowerCase(); }
-    function badgeLabel(pos){ return pos === "hero" ? "히어로" : "빌런"; }
+    function badgeLabel(pos){ return pos === "hero" ? TEXT.hero : TEXT.villain; }
 
     function escapeHtml(str){
       return str.replace(/[&<>"']/g, (m) => ({
@@ -639,23 +715,22 @@
       const factor = dir === "asc" ? 1 : -1;
 
       const sorted = [...filtered].sort((a,b) => {
-      const as = a.comingSoon ? 1 : 0;
-      const bs = b.comingSoon ? 1 : 0;
-      if (as !== bs) return as - bs;
+        const as = a.comingSoon ? 1 : 0;
+        const bs = b.comingSoon ? 1 : 0;
+        if (as !== bs) return as - bs;
 
-      if (key === "grade"){
-        const ra = gradeRank[a.grade] ?? 0;
-        const rb = gradeRank[b.grade] ?? 0;
-        const diff = (ra - rb) * factor;
-        if (diff !== 0) return diff;
-        return normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
-      } else {
-        const diff = normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
-        if (diff !== 0) return diff;
-        return ((gradeRank[a.grade] ?? 0) - (gradeRank[b.grade] ?? 0)) * factor;
-      }
-    });
-
+        if (key === "grade"){
+          const ra = gradeRank[a.grade] ?? 0;
+          const rb = gradeRank[b.grade] ?? 0;
+          const diff = (ra - rb) * factor;
+          if (diff !== 0) return diff;
+          return normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
+        } else {
+          const diff = normalize(a.codename).localeCompare(normalize(b.codename)) * factor;
+          if (diff !== 0) return diff;
+          return ((gradeRank[a.grade] ?? 0) - (gradeRank[b.grade] ?? 0)) * factor;
+        }
+      });
 
       return sorted;
     }
@@ -732,13 +807,14 @@
       const q = searchInput.value.trim();
       syncCounts(list.length);
 
-      const k = sortKey.value === "grade" ? "등급순" : "이름순";
-      const d = sortDir.value === "asc" ? "오름차" : "내림차";
+      const k = sortKey.value === "grade" ? TEXT.sortByRank : TEXT.sortByName;
+      const d = sortDir.value === "asc" ? TEXT.asc : TEXT.desc;
       sortLabel.textContent = `${k} · ${d}`;
 
       grid.innerHTML = "";
       if (list.length === 0){
         empty.style.display = "block";
+        empty.innerHTML = TEXT.emptyHtml;
         return;
       }
       empty.style.display = "none";
@@ -751,27 +827,27 @@
         card.dataset.key = key;
 
         const isSoon = !!c.comingSoon;
-const imgSrc = (!isSoon) ? getThumbUrl(c) : null;
+        const imgSrc = (!isSoon) ? getThumbUrl(c) : null;
 
-const thumbHtml = isSoon
-  ? `<div class="thumb placeholder" aria-label="출시 예정"></div>`
-  : `<div class="thumb"><img src="${imgSrc}" alt="${escapeHtml(c.codename)} 썸네일" loading="lazy" /></div>`;
+        const thumbHtml = isSoon
+          ? `<div class="thumb placeholder" aria-label="${TEXT.comingSoonAria}"></div>`
+          : `<div class="thumb"><img src="${imgSrc}" alt="${escapeHtml(c.codename)}${TEXT.thumbnailAltSuffix}" loading="lazy" /></div>`;
 
-const safeLink = (c.link && c.link !== "#") ? c.link : "#";
-const linkAttrs = (safeLink === "#") ? `` : `target="_blank"`;
+        const safeLink = (c.link && c.link !== "#") ? c.link : "#";
+        const linkAttrs = (safeLink === "#") ? `` : `target="_blank"`;
 
-card.innerHTML = `
-  <a class="link" ${linkAttrs} href="${safeLink}" aria-label="${escapeHtml(c.codename)} 상세 페이지로 이동">
-    ${thumbHtml}
-    <div class="body">
-      <div class="codename">${isSoon ? "?" : highlight(c.codename, q)}</div>
-      <div class="sub">
-        <span class="mini ${c.position}"><strong>${badgeLabel(c.position)}</strong></span>
-        <span class="mini ${isSoon ? "unknown" : ""}"><strong>${escapeHtml(c.grade)}</strong></span>
-      </div>
-    </div>
-  </a>
-`;
+        card.innerHTML = `
+          <a class="link" ${linkAttrs} href="${safeLink}" aria-label="${escapeHtml(c.codename)}${TEXT.detailAriaSuffix}">
+            ${thumbHtml}
+            <div class="body">
+              <div class="codename">${isSoon ? "?" : highlight(c.codename, q)}</div>
+              <div class="sub">
+                <span class="mini ${c.position}"><strong>${badgeLabel(c.position)}</strong></span>
+                <span class="mini ${isSoon ? "unknown" : ""}"><strong>${escapeHtml(c.grade)}</strong></span>
+              </div>
+            </div>
+          </a>
+        `;
 
         frag.appendChild(card);
       }
@@ -782,15 +858,18 @@ card.innerHTML = `
       state.lastToken++;
       const token = state.lastToken;
 
-      const beforeRects = snapshotPositions();
-      const oldKeys = new Set(state.prevKeys);
+const beforeRects = snapshotPositions();
+const oldKeys = new Set(state.prevKeys);
 
-      const nextList = getList();
-      const newKeys = new Set(nextList.map(c => c.id || c.codename));
+const nextList = getList();
+const newKeys = new Set(nextList.map(c => c.id || c.codename));
 
-      const outKeys = [...oldKeys].filter(k => !newKeys.has(k));
-      const outEls = [...grid.querySelectorAll(".card")].filter(el => outKeys.includes(el.dataset.key));
-      const wait = animateOut(outEls);
+const outKeys = [...oldKeys].filter(k => !newKeys.has(k));
+const outEls = [...grid.querySelectorAll(".card")].filter(el =>
+  outKeys.includes(el.dataset.key)
+);
+const wait = animateOut(outEls);
+
 
       clearTimeout(state.rafId);
       state.rafId = setTimeout(() => {
@@ -805,13 +884,14 @@ card.innerHTML = `
     function syncThumbToggleUI(){
       const isId = state.thumbMode === "id";
       thumbModeBtn.dataset.on = isId ? "true" : "false";
-      thumbModeText.textContent = isId ? "ID" : "MAIN";
-      thumbModeBtn.setAttribute("aria-label", isId ? "썸네일 모드: 증명사진" : "썸네일 모드: 메인이미지");
+      thumbModeText.textContent = isId ? TEXT.thumbId : TEXT.thumbMain;
+      thumbModeBtn.setAttribute("aria-label",
+        isId
+          ? (isKo ? "썸네일 모드: 증명사진" : "Thumbnail mode: ID")
+          : (isKo ? "썸네일 모드: 메인이미지" : "Thumbnail mode: MAIN")
+      );
     }
 
-    // =========================
-    // [ADDED] Sticky header logic
-    // =========================
     function setStickyVisible(on){
       if (on){
         stickyTop.classList.add("show");
@@ -824,11 +904,9 @@ card.innerHTML = `
     }
 
     function computeStickyThreshold(){
-      // controls 아래부터 보여주면 자연스럽다
-      const controls = $(".title");
+      const controls = document.querySelector(".title");
       const rect = controls.getBoundingClientRect();
       const y = window.scrollY + rect.top;
-      // controls가 화면 위로 충분히 올라가면(show)
       return y + rect.height + 40;
     }
 
@@ -858,6 +936,8 @@ card.innerHTML = `
     }
 
     function init(){
+      applyLanguageStaticTexts();
+
       const first = getList();
       renderFromList(first);
       state.prevKeys = new Set(first.map(c => c.id || c.codename));
@@ -912,7 +992,7 @@ card.innerHTML = `
 
       syncThumbToggleUI();
       syncSortToggleUI();
-      initSticky(); // [ADDED]
+      initSticky();
     }
 
     init();
