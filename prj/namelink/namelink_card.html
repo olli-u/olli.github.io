@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Character Card Maker</title>
+
+  <!-- DOM -> 이미지 캡쳐 -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- GIF 생성 라이브러리 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+
+  <style>
+    :root{
+  --page-bg:#020617;
+  --panel-bg:#020617;
+  --panel-border:rgba(148,163,184,.35);
+  --panel-radius:18px;
+  --panel-shadow:0 18px 50px rgba(15,23,42,.7);
+
+  /* default rank: S (네온 카드 색 조합 유지) */
+  --rankBorder1:#f8fb12;
+  --rankBorder2:#ff4da5;
+  --rankBorder3:#1fe8ff;
+  --rankColor:#fbbf24;
+  --rankColorSoft:#fef3c7;
+  --dangerBg:#fef3c7;
+  --dangerText:#92400e;
+
+  --exportScale:1;
+}
+
+
+    *{box-sizing:border-box;}
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo",
+      "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
+      color:#2a2a2a;
+    }
+
+    .page{
+      max-width:1100px;
+      margin:24px auto 40px;
+      padding:0 16px 32px;
+    }
+
+    h1{
+      margin:8px 0 4px;
+      font-size:24px;
+      font-weight:800;
+      letter-spacing:0.03em;
+    }
+
+    .subtitle{
+      font-size:12px;
+      color:#9ca3af;
+      margin-bottom:18px;
+    }
+
+    .layout{
+      display:flex;
+      flex-wrap:wrap;
+      gap:20px;
+      align-items:flex-start;
+    }
+
+    .controls{
+      flex:1 1 280px;
+      min-width:260px;
+      background:rgba(15,23,42,.92);
+      border-radius:var(--panel-radius);
+      border:1px solid var(--panel-border);
+      box-shadow:var(--panel-shadow);
+      padding:16px 16px 18px;
+    }
+
+    .controls h2{
+      font-size:14px;
+      margin:0 0 8px;
+      font-weight:700;
+    }
+
+    .form-group{
+      margin-bottom:10px;
+      font-size:11px;
+    }
+
+    .form-group label{
+      display:block;
+      margin-bottom:4px;
+      color:#cbd5f5;
+      font-weight:600;
+    }
+
+    .form-row{
+      display:flex;
+      gap:6px;
+    }
+
+    .form-row > *{
+      flex:1;
+    }
+
+    input[type="text"],
+    select{
+      width:100%;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,.5);
+      background:#020617;
+      color:#e5e7eb;
+      font-size:11px;
+      outline:none;
+    }
+
+    input[type="file"]{
+      width:100%;
+      font-size:11px;
+    }
+
+    input[type="text"]:focus,
+    select:focus{
+      border-color:#7c3aed;
+      box-shadow:0 0 0 1px rgba(124,58,237,.5);
+    }
+
+    .hint{
+      font-size:10px;
+      color:#9ca3af;
+      margin-top:2px;
+    }
+
+    .scale-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .scale-row span{
+      font-size:10px;
+      color:#9ca3af;
+      white-space:nowrap;
+    }
+
+    input[type="range"]{
+      flex:1;
+    }
+
+    .preview{
+      flex:1.2 1 320px;
+      min-width:340px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+    }
+
+    .btn-save{
+      border:none;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:600;
+      cursor:pointer;
+      background:linear-gradient(135deg,#4f46e5,#ec4899);
+      color:#f9fafb;
+      box-shadow:0 3px 8px rgba(0,0,0,.4);
+      white-space:nowrap;
+    }
+
+    .btn-save:nth-child(2){
+      background:linear-gradient(135deg,#0ea5e9,#22c55e);
+    }
+
+    .btn-save:active{
+      transform:translateY(1px);
+      box-shadow:0 1px 4px rgba(0,0,0,.5);
+    }
+
+    /* ===== CARD ===== */
+
+    .card-wrapper{
+      flex:1 1 320px;
+      min-width:260px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+    }
+
+    /* PC에서도 비율 유지 */
+    .card-border{
+      width:100%;
+      max-width:380px;
+      aspect-ratio: 7 / 11;
+      border-radius:22px;
+      background:linear-gradient(135deg,var(--rankBorder1),var(--rankBorder2),var(--rankBorder3));
+      padding:6px; /* 테두리 두께 */
+      box-sizing:border-box;
+      box-shadow:0 12px 28px rgba(15,23,42,0.75);
+      position:relative;
+      overflow:hidden;
+      display:flex;
+    }
+
+    /* 네온 테두리 위에 얹히는 노이즈 */
+    .card-border-noise{
+      position:absolute;
+      inset:0;
+      border-radius:22px;
+
+      background-image:
+        repeating-linear-gradient(135deg,
+          rgba(255,255,255,1) 0,
+          rgba(255,255,255,1) 2px,
+          transparent 2px,
+          transparent 4px),
+        repeating-linear-gradient(45deg,
+          rgba(0,0,0,.7) 0,
+          rgba(0,0,0,.7) 1.5px,
+          transparent 1.5px,
+          transparent 3px);
+
+      mix-blend-mode:overlay;
+      pointer-events:none;
+      opacity:0.2;
+      z-index:1;
+
+      animation:noiseMove 0.6s steps(3) infinite;
+    }
+
+    @keyframes noiseMove{
+      0%{transform:translate3d(0,0,0);}
+      25%{transform:translate3d(6px,-4px,0);}
+      50%{transform:translate3d(-5px,3px,0);}
+      75%{transform:translate3d(3px,-6px,0);}
+      100%{transform:translate3d(0,0,0);}
+    }
+
+    .card-inner{
+      position:relative;
+      border-radius:18px;
+      background:radial-gradient(circle at top,#1f2937 0,#020617 55%,#020617 100%);
+      padding:10px 10px 12px;
+      box-sizing:border-box;
+      display:flex;
+      flex-direction:column;
+      align-items:stretch;
+      overflow:hidden;
+      width:100%;
+      height:100%;
+      z-index:2; /* 내용이 노이즈보다 위 */
+    }
+
+    .card-rank-row{
+      display:flex;
+      justify-content:flex-end;
+    }
+
+    .card-rank-label{
+  padding:2px 7px;
+  border-radius:8px;
+  color:var(--rankColor);
+  font-size:calc(26px * var(--exportScale));
+  font-weight:800;
+  letter-spacing:.5px;
+  text-shadow:-1px 0 #fff, 1px 0 #000, 0 1px #000, 0 -1px #000,
+  0 0 6px rgba(251,191,36,0.9);
+  font-family:Impact, system-ui, sans-serif;
+}
+
+
+    .card-image-area{
+      margin-top:10px;
+      border-radius:14px;
+      background:url('https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=500/charim/e0ced288-81ac-4ee3-a37b-577499e416f2?v=17652048340000') no-repeat bottom center/cover;
+      padding:10px 6px 8px;
+      box-sizing:border-box;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      flex:1 1 auto;
+      min-height:0;
+      overflow:hidden;
+      --imgScale:0.8;
+      --imgOffsetX:30;
+      --imgOffsetY:80;
+    }
+
+    /* card-image-area 안에 딱 맞게 꽉 채우기 */
+    .card-char-wrap{
+      position:absolute;
+      inset:0;
+      margin:0;
+      width:100%;
+      height:100%;
+      max-width:none;
+      display:flex;
+      justify-content:center;
+      align-items:flex-end;
+      border-radius:12px;
+      overflow:hidden;
+      background:transparent;
+    }
+
+    .card-char-bg{
+  position:relative;
+  width:100%;
+  height:100%;
+  background-repeat:no-repeat;
+  background-position:calc(var(--imgOffsetX) * 1%) calc(var(--imgOffsetY) * 1%);
+  background-size:calc(85% * var(--imgScale)) auto;
+
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+
+    .badge-role-name{
+  position:absolute;
+  top:8px;
+  left:10px;
+  padding:2px 6px;
+  border-radius:999px;
+  background:rgba(15,23,42,0.85);
+  border:1px solid rgba(148,163,184,0.7);
+  font-size:calc(9px * var(--exportScale));
+  color:#e5e7eb;
+  font-weight:700;
+  letter-spacing:.5px;
+  z-index:3;
+}
+
+
+    .card-emoji{
+  position:absolute;
+  font-size:calc(30px * var(--exportScale));
+  animation:tada 2s infinite;
+  z-index:3;
+}
+
+
+    .card-emoji-1{ top:14%; right:10%; }
+    .card-emoji-2{ top:52%; left:8%; }
+    .card-emoji-3{ bottom:9%; right:16%; }
+
+    @keyframes tada{
+      0%{transform:scale(1);}
+      10%,20%{transform:scale(.9) rotate(-3deg);}
+      30%,50%,70%,90%{transform:scale(1.1) rotate(3deg);}
+      40%,60%,80%{transform:scale(1.1) rotate(-3deg);}
+      100%{transform:scale(1);}
+    }
+
+    .card-footer{
+      margin-top:8px;
+      border-radius:12px;
+      background:linear-gradient(90deg,#0f172a,#020617);
+      padding:6px 8px 7px;
+      box-sizing:border-box;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 -1px 0 rgba(148,163,184,0.4),
+                 0 6px 10px rgba(0,0,0,0.7);
+      gap:8px;
+    }
+
+    .card-names{
+      min-width:0;
+    }
+
+    .name-ko{
+  margin:0;
+  font-size:calc(19px * var(--exportScale));
+  font-weight:900;
+  color:var(--rankColorSoft);
+  text-shadow:-1px 0 #000,1px 0 #000,0 1px #000,0 -1px #000,
+  0 0 6px rgba(251,191,36,0.8);
+  letter-spacing:1px;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  max-width:160px;
+}
+
+
+.name-extra{
+  margin:1px 0 0;
+  font-size:calc(10px * var(--exportScale));
+  color:#9ca3af;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  max-width:180px;
+}
+
+
+    .card-badges{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      font-size:9px;
+      gap:3px;
+    }
+
+    .pill{
+  padding:3px 8px;
+  border-radius:999px;
+  font-weight:800;
+  letter-spacing:.5px;
+  white-space:nowrap;
+  font-size:calc(9px * var(--exportScale));
+}
+
+
+    .role-pill{
+      background:#eef2ff;
+      color:#3730a3;
+    }
+
+    .danger-pill{
+      background:var(--dangerBg);
+      color:var(--dangerText);
+    }
+
+    .card-bottom-text{
+  margin-top:5px;
+  text-align:right;
+  font-size:calc(8px * var(--exportScale));
+  color:#9ca3af;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+
+    /* ===== RANK THEME (등급별 테두리 + 이름색) ===== */
+
+    /* SS: 붉은 느낌 */
+    .rank-SS{
+      --rankBorder1:#ec0606;
+      --rankBorder2:#fb5a3c;
+      --rankBorder3:#ffd37a;
+      --rankColor:#da0505;
+      --rankColorSoft:#ffe4e0;
+      --dangerBg:#fee2e2;
+      --dangerText:#b91c1c;
+      --nameColor:#ffe4e0;
+    }
+
+    /* S: 골드 */
+    .rank-S{
+      --rankBorder1:#fbc112;
+      --rankBorder2:#fff64d;
+      --rankBorder3:#ffe6a7;
+      --rankColor:#fbbf24;
+      --rankColorSoft:#fef3c7;
+      --dangerBg:#fee2e2;
+      --dangerText:#92400e;
+      --nameColor:#fef3c7;
+    }
+
+    /* A: 보라 */
+    .rank-A{
+      --rankBorder1:#8b5cf6;
+      --rankBorder2:#a855f7;
+      --rankBorder3:#c4b5fd;
+      --rankColor:#e9d5ff;
+      --rankColorSoft:#f5ebff;
+      --dangerBg:#f5ebff;
+      --dangerText:#6b21a8;
+      --nameColor:#f5ebff;
+    }
+
+    /* B: 파랑 */
+    .rank-B{
+      --rankBorder1:#2563eb;
+      --rankBorder2:#3b82f6;
+      --rankBorder3:#93c5fd;
+      --rankColor:#bfdbfe;
+      --rankColorSoft:#e0f2fe;
+      --dangerBg:#e0f2fe;
+      --dangerText:#1d4ed8;
+      --nameColor:#e0f2fe;
+    }
+
+    /* C: 초록 */
+    .rank-C{
+      --rankBorder1:#16a34a;
+      --rankBorder2:#22c55e;
+      --rankBorder3:#86efac;
+      --rankColor:#bbf7d0;
+      --rankColorSoft:#dcfce7;
+      --dangerBg:#dcfce7;
+      --dangerText:#166534;
+      --nameColor:#dcfce7;
+    }
+
+    /* D: 흰색 계열 */
+    .rank-D{
+      --rankBorder1:#e5e7eb;
+      --rankBorder2:#f3f4f6;
+      --rankBorder3:#ffffff;
+      --rankColor:#e5e7eb;
+      --rankColorSoft:#ffffff;
+      --dangerBg:#f9fafb;
+      --dangerText:#1f2937;
+      --nameColor:#ffffff;
+    }
+
+    /* F: 회색 */
+    .rank-F{
+      --rankBorder1:#111827;
+      --rankBorder2:#4b5563;
+      --rankBorder3:#9ca3af;
+      --rankColor:#d1d5db;
+      --rankColorSoft:#e5e7eb;
+      --dangerBg:#e5e7eb;
+      --dangerText:#111827;
+      --nameColor:#e5e7eb;
+    }
+
+    @media (max-width:768px){
+      .layout{
+        flex-direction:column;
+        justify-content: center;
+        align-items: center;
+      }
+      .preview{
+        order:-1;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1>NAME LINK Card Maker </h1>
+  <div class="subtitle">by. 𝕏 @Olli_mine</div>
+
+  <div class="layout">
+    <!-- PREVIEW -->
+    <section class="preview">
+      <div class="card-wrapper rank-S" id="cardWrapper">
+        <div class="card-border" id="cardBorder">
+          <div class="card-border-noise"></div>
+          <div class="card-inner">
+            <div class="card-rank-row">
+              <div class="card-rank-label" id="rankLabel">S Rank</div>
+            </div>
+
+            <div class="card-image-area" id="imageArea">
+              <div class="badge-role-name" id="roleBadge">HERO : TASER</div>
+
+              <!-- 캐릭터 background -->
+              <div class="card-char-wrap">
+                <div
+                  id="charBg"
+                  class="card-char-bg"
+                  style="background-image:url('https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=500/charim/9f577ff3-c4e4-406b-9511-aa47e711b570?v=17653413600000');">
+                </div>
+              </div>
+
+              <div class="card-emoji card-emoji-1" id="emojiSlot1">💦</div>
+              <div class="card-emoji card-emoji-2" id="emojiSlot2">🍬</div>
+              <div class="card-emoji card-emoji-3" id="emojiSlot3">🏠</div>
+            </div>
+
+            <div class="card-footer">
+              <div class="card-names">
+                <p class="name-ko" id="nameKoLabel">테이저</p>
+                <p class="name-extra" id="nameSub">Taser · S급 초능력 보유 히어로</p>
+              </div>
+              <div class="card-badges">
+                <span class="pill role-pill" id="rolePill">ROLE · HERO</span>
+                <span class="pill danger-pill" id="dangerPill">DANGER · S</span>
+              </div>
+            </div>
+
+            <div class="card-bottom-text">
+              <span>AEGIS DOMINION HEADQUARTERS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTROLS -->
+    <section class="controls">
+      <h2>세팅</h2>
+
+      <div class="form-group">
+        <label for="imageInput">1. 캐릭터 이미지</label>
+        <input type="file" id="imageInput" accept="image/png,image/*">
+        <div class="hint">흰색 배경의 이미지를 업로드 하면 자동으로 배경이 지워지지만, 직접 배경을 지운 png 이미지를 사용하시는 것을 권장합니다.</div>
+      </div>
+
+      <div class="form-group">
+        <label>2. 이름</label>
+        <div class="form-row">
+          <input type="text" id="nameKo" placeholder="한글 이름 (예: 테이저)">
+          <input type="text" id="nameEn" placeholder="영문 이름 (예: Taser)">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>3. 롤 & 등급</label>
+        <div class="form-row">
+          <select id="roleSelect">
+            <option value="hero" selected>히어로 (HERO)</option>
+            <option value="villain">빌런 (VILLAIN)</option>
+            <option value="normal">노말 (NORMAL)</option>
+          </select>
+          <select id="rankSelect">
+            <option value="SS">SS</option>
+            <option value="S" selected>S</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="F">F</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>4. 카드 이모지 3개</label>
+        <div class="form-row">
+          <input type="text" id="emoji1" value="💦">
+          <input type="text" id="emoji2" value="🍬">
+          <input type="text" id="emoji3" value="🏠">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>5. 이미지 크기 조절</label>
+        <div class="scale-row">
+          <span>작게</span>
+          <input type="range" id="scaleRange" min="0.6" max="1.4" step="0.05" value="0.8">
+          <span>크게</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>6. 이미지 위치 조절</label>
+        <div class="scale-row">
+          <span>좌</span>
+          <input type="range" id="offsetXRange" min="0" max="100" value="30">
+          <span>우</span>
+        </div>
+        <div class="scale-row" style="margin-top:4px;">
+          <span>위</span>
+          <input type="range" id="offsetYRange" min="0" max="100" value="80">
+          <span>아래</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>7. 카드 저장</label>
+        <div class="form-row">
+          <button type="button" id="saveJpgBtn" class="btn-save">JPG 저장</button>
+          <button type="button" id="saveGifBtn" class="btn-save">GIF 저장(움짤)</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  const imageInput = document.getElementById('imageInput');
+  const imageArea = document.getElementById('imageArea');
+  const charBg = document.getElementById('charBg');
+  const cardWrapper = document.getElementById('cardWrapper');
+  const cardBorder = document.getElementById('cardBorder');
+
+  const nameKoInput = document.getElementById('nameKo');
+  const nameEnInput = document.getElementById('nameEn');
+  const roleSelect = document.getElementById('roleSelect');
+  const rankSelect = document.getElementById('rankSelect');
+
+  const emoji1Input = document.getElementById('emoji1');
+  const emoji2Input = document.getElementById('emoji2');
+  const emoji3Input = document.getElementById('emoji3');
+
+  const rankLabel = document.getElementById('rankLabel');
+  const roleBadge = document.getElementById('roleBadge');
+  const nameKoLabel = document.getElementById('nameKoLabel');
+  const nameSub = document.getElementById('nameSub');
+  const rolePill = document.getElementById('rolePill');
+  const dangerPill = document.getElementById('dangerPill');
+
+  const emojiSlot1 = document.getElementById('emojiSlot1');
+  const emojiSlot2 = document.getElementById('emojiSlot2');
+  const emojiSlot3 = document.getElementById('emojiSlot3');
+
+  const scaleRange = document.getElementById('scaleRange');
+  const offsetXRange = document.getElementById('offsetXRange');
+  const offsetYRange = document.getElementById('offsetYRange');
+
+  const saveJpgBtn = document.getElementById('saveJpgBtn');
+  const saveGifBtn = document.getElementById('saveGifBtn');
+
+  const rankClasses = ['rank-SS','rank-S','rank-A','rank-B','rank-C','rank-D','rank-F'];
+
+  const roleKorMap = {
+    hero:'히어로',
+    villain:'빌런',
+    normal:'노말'
+  };
+
+  const roleEngMap = {
+    hero:'HERO',
+    villain:'VILLAIN',
+    normal:'NORMAL'
+  };
+
+  // ===== 배경 제거 + background-image로 넣기 =====
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+
+          const isAlmostWhite = (r > 240 && g > 240 && b > 240);
+          const isGreenScreen = (g > 120 && g > r + 30 && g > b + 30);
+
+          if (isAlmostWhite || isGreenScreen) {
+            data[i + 3] = 0;
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        const url = canvas.toDataURL('image/png');
+        charBg.style.backgroundImage = `url("${url}")`;
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // ===== 카드 텍스트 / 스타일 =====
+  function refreshCard(){
+    const nameKo = (nameKoInput.value || '테이저').trim();
+    const nameEn = (nameEnInput.value || 'Taser').trim();
+    const rank = rankSelect.value;
+    const role = roleSelect.value;
+
+    const roleKor = roleKorMap[role];
+    const roleEng = roleEngMap[role];
+
+    cardWrapper.classList.remove(...rankClasses);
+    cardWrapper.classList.add('rank-' + rank);
+
+    rankLabel.textContent = rank + ' Rank';
+    roleBadge.textContent = roleEng + ' : ' + nameEn.toUpperCase();
+
+    nameKoLabel.textContent = nameKo;
+    nameSub.textContent = `${nameEn} · ${rank}급 초능력 보유 ${roleKor}`;
+
+    rolePill.textContent = 'ROLE · ' + roleEng;
+    dangerPill.textContent = 'DANGER · ' + rank;
+
+    emojiSlot1.textContent = (emoji1Input.value || '💦').trim() || '💦';
+    emojiSlot2.textContent = (emoji2Input.value || '🍬').trim() || '🍬';
+    emojiSlot3.textContent = (emoji3Input.value || '🏠').trim() || '🏠';
+  }
+
+  nameKoInput.addEventListener('input', refreshCard);
+  nameEnInput.addEventListener('input', refreshCard);
+  roleSelect.addEventListener('change', refreshCard);
+  rankSelect.addEventListener('change', refreshCard);
+  emoji1Input.addEventListener('input', refreshCard);
+  emoji2Input.addEventListener('input', refreshCard);
+  emoji3Input.addEventListener('input', refreshCard);
+
+  // ===== 이미지 크기 / 위치 조절 =====
+  scaleRange.addEventListener('input', (e) => {
+    const value = e.target.value;
+    imageArea.style.setProperty('--imgScale', value);
+  });
+
+  offsetXRange.addEventListener('input', (e) => {
+    imageArea.style.setProperty('--imgOffsetX', e.target.value);
+  });
+
+  offsetYRange.addEventListener('input', (e) => {
+    imageArea.style.setProperty('--imgOffsetY', e.target.value);
+  });
+
+  async function downloadJpg() {
+  const nameEn = (nameEnInput.value || 'card').trim() || 'card';
+
+  // 맥이면 보통 2, 윈도우도 1~2
+  const scale = window.devicePixelRatio || 1;
+
+  const canvas = await html2canvas(cardBorder, {
+    backgroundColor: '#ffffff',
+    scale,       // 고정 3 말고, 디바이스에 맞게
+    useCORS: true
+  });
+
+  const link = document.createElement('a');
+  link.href = canvas.toDataURL('image/jpeg', 0.95);
+  link.download = `${nameEn}_card.jpg`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+
+
+
+  saveJpgBtn.addEventListener('click', () => {
+    downloadJpg().catch(console.error);
+  });
+
+  // ===== GIF 저장 (움짤) =====
+  async function downloadGif() {
+    const nameEn = (nameEnInput.value || 'card').trim() || 'card';
+
+    const rect = cardBorder.getBoundingClientRect();
+    const width = Math.round(rect.width * 2);
+    const height = Math.round(rect.height * 2);
+
+    const gif = new GIF({
+      workers: 2,
+      quality: 10,
+      width,
+      height,
+      workerScript: 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js'
+    });
+
+    const frameCount = 10;
+    const frameDelay = 120;
+
+    for (let i = 0; i < frameCount; i++) {
+      await new Promise(r => setTimeout(r, frameDelay));
+      const canvas = await html2canvas(cardBorder, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true
+      });
+      gif.addFrame(canvas, { delay: frameDelay, copy: true });
+    }
+
+    gif.on('finished', (blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${nameEn}_card.gif`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+
+    gif.render();
+  }
+
+  saveGifBtn.addEventListener('click', () => {
+    downloadGif().catch(console.error);
+  });
+
+  refreshCard();
+</script>
+</body>
+</html>
