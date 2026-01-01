@@ -241,7 +241,6 @@
 
     .card-inner{
       position:absolute;
-      /* 테두리 두께 6px 대신 inset으로 확보 */
       inset:6px;
       border-radius:18px;
       background:radial-gradient(circle at top,#1f2937 0,#020617 55%,#020617 100%);
@@ -253,7 +252,7 @@
       overflow:hidden;
       width:calc(100% - 12px);
       height:calc(100% - 12px);
-      z-index:2; /* 내용이 노이즈보다 위 */
+      z-index:2;
     }
 
     .card-rank-row{
@@ -286,9 +285,6 @@
       flex:1 1 auto;
       min-height:0;
       overflow:hidden;
-      --imgScale:0.8;
-      --imgOffsetX:30;
-      --imgOffsetY:80;
     }
 
     .card-char-wrap{
@@ -297,41 +293,54 @@
       margin:0;
       width:100%;
       height:100%;
-      max-width:none;
       display:flex;
       justify-content:center;
       align-items:flex-end;
       border-radius:12px;
       overflow:hidden;
       background:transparent;
+      pointer-events:none;
     }
 
-    .card-char-bg{
-      position:relative;
-      width:100%;
-      height:100%;
-      background-repeat:no-repeat;
-      background-position:calc(var(--imgOffsetX) * 1%) calc(var(--imgOffsetY) * 1%);
-      background-size:calc(85% * var(--imgScale)) auto;
-      image-rendering: -webkit-optimize-contrast; /* 크롬, 사파리에서 선명하게 */
-  image-rendering: crisp-edges;
-  transform: translateZ(0); /* 하드웨어 가속 유도 */
+    .card-char-inner{
+      position:absolute;
+      bottom:0;
+      left:50%;
+      /* 기본: 카드 하단 중앙에 서 있는 상태 */
+      transform:translate(-50%, 0) scale(0.8);
+      transform-origin:50% 100%;
+    }
+
+    .card-char-img{
+      display:block;
+      height:130%;
+      width:auto;
+      pointer-events:none;
+      image-rendering:auto;
     }
 
     .badge-role-name{
-      position:absolute;
-      top:8px;
-      left:10px;
-      padding:2px 6px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.85);
-      border:1px solid rgba(148,163,184,0.7);
-      font-size:calc(9px * var(--exportScale));
-      color:#e5e7eb;
-      font-weight:700;
-      letter-spacing:.5px;
-      z-index:3;
-    }
+  position:absolute;
+  top:8px;
+  left:10px;
+  padding:2px 8px 4px;   /* 위 2px / 아래 4px */
+  border-radius:999px;
+  background:rgba(15,23,42,0.85);
+  border:1px solid rgba(148,163,184,0.7);
+  font-size:calc(9px * var(--exportScale));
+  color:#e5e7eb;
+  font-weight:700;
+  letter-spacing:.5px;
+  z-index:3;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+}
+
+
+
 
     .card-emoji{
       position:absolute;
@@ -403,13 +412,21 @@
     }
 
     .pill{
-      padding:3px 8px;
-      border-radius:999px;
-      font-weight:800;
-      letter-spacing:.5px;
-      white-space:nowrap;
-      font-size:calc(9px * var(--exportScale));
-    }
+  padding:2px 9px 4px;   /* 위 2px, 아래 4px → 글자가 살짝 위로 올라간 느낌 */
+  border-radius:999px;
+  font-weight:800;
+  letter-spacing:.5px;
+  white-space:nowrap;
+  font-size:calc(9px * var(--exportScale));
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+}
+
+
+
 
     .role-pill{
       background:#eef2ff;
@@ -430,7 +447,7 @@
       text-transform:uppercase;
     }
 
-    /* ===== RANK THEME (등급별 테두리 + 이름색) ===== */
+    /* ===== RANK THEME ===== */
 
     .rank-SS{
       --rankBorder1:#ec0606;
@@ -465,7 +482,7 @@
       --nameColor:#f5ebff;
     }
     .rank-A .card-rank-label {
-        text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
+      text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
     }
 
     .rank-B{
@@ -479,7 +496,7 @@
       --nameColor:#e0f2fe;
     }
     .rank-B .card-rank-label {
-        text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
+      text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
     }
 
     .rank-C{
@@ -493,7 +510,7 @@
       --nameColor:#dcfce7;
     }
     .rank-C .card-rank-label {
-        text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
+      text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
     }
 
     .rank-D{
@@ -507,7 +524,7 @@
       --nameColor:#ffffff;
     }
     .rank-D .card-rank-label {
-        text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
+      text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
     }
 
     .rank-F{
@@ -521,8 +538,9 @@
       --nameColor:#e5e7eb;
     }
     .rank-F .card-rank-label {
-        text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
+      text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
     }
+
     @media (max-width:768px){
       .layout{
         flex-direction:column;
@@ -554,12 +572,14 @@
             <div class="card-image-area" id="imageArea">
               <div class="badge-role-name" id="roleBadge">HERO : TASER</div>
 
-              <!-- 캐릭터 background -->
+              <!-- 캐릭터 이미지 (IMG 버전) -->
               <div class="card-char-wrap">
-                <div
-                  id="charBg"
-                  class="card-char-bg"
-                  style="background-image:url('./src/image.png');">
+                <div class="card-char-inner" id="charInner">
+                  <img
+                    id="charImg"
+                    class="card-char-img"
+                    src="./src/image.png"
+                    alt="character">
                 </div>
               </div>
 
@@ -580,7 +600,7 @@
             </div>
 
             <div class="card-bottom-text">
-              <span>AEGIS DOMINION HEADQUARTERS</span>
+              <span>NAME LINK</span>
             </div>
           </div>
         </div>
@@ -638,7 +658,7 @@
         <label>5. 이미지 크기 조절</label>
         <div class="scale-row">
           <span>작게</span>
-          <input type="range" id="scaleRange" min="0.6" max="1.4" step="0.05" value="0.8">
+          <input type="range" id="scaleRange" min="0.3" max="1.3" step="0.02" value="0.42">
           <span>크게</span>
         </div>
       </div>
@@ -647,13 +667,13 @@
         <label>6. 이미지 위치 조절</label>
         <div class="scale-row">
           <span>좌</span>
-          <input type="range" id="offsetXRange" min="0" max="100" value="30">
+          <input type="range" id="offsetXRange" min="-100" max="100" value="-20">
           <span>우</span>
         </div>
         <div class="scale-row" style="margin-top:4px;">
-          <span>위</span>
-          <input type="range" id="offsetYRange" min="0" max="100" value="80">
-          <span>아래</span>
+          <span>상</span>
+          <input type="range" id="offsetYRange" min="-100" max="100" value="-10">
+          <span>하</span>
         </div>
       </div>
 
@@ -670,10 +690,10 @@
 
 <script>
   const imageInput = document.getElementById('imageInput');
-  const imageArea = document.getElementById('imageArea');
-  const charBg = document.getElementById('charBg');
   const cardWrapper = document.getElementById('cardWrapper');
   const cardBorder = document.getElementById('cardBorder');
+  const charInner = document.getElementById('charInner');
+  const charImg = document.getElementById('charImg');
 
   const nameKoInput = document.getElementById('nameKo');
   const nameEnInput = document.getElementById('nameEn');
@@ -716,7 +736,20 @@
     normal:'NORMAL'
   };
 
-  // ===== 배경 제거 + background-image로 넣기 =====
+  // ===== 위치/크기 상태값 =====
+  let currentScale = parseFloat(scaleRange.value);
+  let currentOffsetX = parseFloat(offsetXRange.value); // px
+  let currentOffsetY = parseFloat(offsetYRange.value); // px
+
+  function updateCharTransform() {
+    charInner.style.transform =
+      `translate(calc(-50% + ${currentOffsetX}px), ${currentOffsetY}px) scale(${currentScale})`;
+  }
+
+  // 초기 transform 세팅
+  updateCharTransform();
+
+  // ===== 배경 제거 + IMG src로 넣기 =====
   imageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -749,7 +782,7 @@
 
         ctx.putImageData(imageData, 0, 0);
         const url = canvas.toDataURL('image/png');
-        charBg.style.backgroundImage = `url("${url}")`;
+        charImg.src = url;
       };
       img.src = ev.target.result;
     };
@@ -791,62 +824,58 @@
   emoji2Input.addEventListener('input', refreshCard);
   emoji3Input.addEventListener('input', refreshCard);
 
-  // ===== 이미지 크기 / 위치 조절 =====
+  // ===== 이미지 크기 / 위치 조절 (IMG용) =====
   scaleRange.addEventListener('input', (e) => {
-    const value = e.target.value;
-    imageArea.style.setProperty('--imgScale', value);
+    currentScale = parseFloat(e.target.value);
+    updateCharTransform();
   });
 
   offsetXRange.addEventListener('input', (e) => {
-    imageArea.style.setProperty('--imgOffsetX', e.target.value);
+    currentOffsetX = parseFloat(e.target.value);
+    updateCharTransform();
   });
 
   offsetYRange.addEventListener('input', (e) => {
-    imageArea.style.setProperty('--imgOffsetY', e.target.value);
+    currentOffsetY = parseFloat(e.target.value);
+    updateCharTransform();
   });
 
   async function downloadJpg() {
-  const nameEn = (nameEnInput.value || 'card').trim() || 'card';
-  
-  // 변경: 배율을 강제로 2배 혹은 3배로 높입니다. (선명도의 핵심!)
-  const exportScale = 2; 
+    const nameEn = (nameEnInput.value || 'card').trim() || 'card';
 
-  const baseCanvas = await html2canvas(cardBorder, {
-    backgroundColor: '#ffffff',
-    scale: exportScale, // 화면 해상도 상관없이 2배 고화질로 캡처
-    useCORS: true,
-    logging: false,
-    imageTimeout: 0
-  });
+    const exportScale = 2;
 
-  // 여백 값도 스케일에 맞춰 조정
-  const paddingX = 30 * exportScale;
-  const paddingY = 40 * exportScale;
+    const baseCanvas = await html2canvas(cardBorder, {
+      backgroundColor: '#ffffff',
+      scale: exportScale,
+      useCORS: true,
+      logging: false,
+      imageTimeout: 0
+    });
 
-  const finalCanvas = document.createElement('canvas');
-  finalCanvas.width = baseCanvas.width + paddingX * 2;
-  finalCanvas.height = baseCanvas.height + paddingY * 2;
+    const paddingX = 20 * exportScale;
+    const paddingY = 20 * exportScale;
 
-  const ctx = finalCanvas.getContext('2d');
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = baseCanvas.width + paddingX * 2;
+    finalCanvas.height = baseCanvas.height + paddingY * 2;
 
-  // 이미지 앨리어싱 방지 설정 (선택 사항)
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
+    const ctx = finalCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-  ctx.drawImage(baseCanvas, paddingX, paddingY);
+    ctx.drawImage(baseCanvas, paddingX, paddingY);
 
-  const link = document.createElement('a');
-  // JPG 품질을 1.0(최고치)으로 설정
-  link.href = finalCanvas.toDataURL('image/png', 1.0); 
-  link.download = `${nameEn}_card.png`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
+    const link = document.createElement('a');
+    link.href = finalCanvas.toDataURL('image/png', 1.0);
+    link.download = `${nameEn}_card.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
   saveJpgBtn.addEventListener('click', () => {
     downloadJpg().catch(console.error);
