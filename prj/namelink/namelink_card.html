@@ -5,6 +5,25 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NAME LINK Card Maker</title>
 
+  <!-- iOS(아이폰/아이패드) + Mac Safari 감지 -->
+  <script>
+    (function () {
+  var ua = navigator.userAgent || navigator.vendor || window.opera;
+
+  // iOS (iPhone / iPad / iPod)
+  var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+  // 맥 전체 (브라우저 가리지 않고)
+  var isMac = /Macintosh|Mac OS X/.test(ua);
+
+  // iOS + Mac 이면 전부 보정 클래스 적용
+  if (isIOS || isMac) {
+    document.documentElement.classList.add('is-ios');
+  }
+})();
+
+  </script>
+
   <!-- DOM -> 이미지 캡쳐 -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <!-- GIF 생성 라이브러리 -->
@@ -319,28 +338,26 @@
       image-rendering:auto;
     }
 
+    /* 공통 기본 배지 스타일 (모든 브라우저 공통) */
     .badge-role-name{
-  position:absolute;
-  top:8px;
-  left:10px;
-  padding:2px 8px 4px;   /* 위 2px / 아래 4px */
-  border-radius:999px;
-  background:rgba(15,23,42,0.85);
-  border:1px solid rgba(148,163,184,0.7);
-  font-size:calc(9px * var(--exportScale));
-  color:#e5e7eb;
-  font-weight:700;
-  letter-spacing:.5px;
-  z-index:3;
+      position:absolute;
+      top:8px;
+      left:10px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.85);
+      border:1px solid rgba(148,163,184,0.7);
+      font-size:calc(9px * var(--exportScale));
+      color:#e5e7eb;
+      font-weight:700;
+      letter-spacing:.5px;
+      z-index:3;
 
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  line-height:1;
-}
-
-
-
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+    }
 
     .card-emoji{
       position:absolute;
@@ -411,22 +428,20 @@
       gap:3px;
     }
 
+    /* 공통 기본 pill 스타일 (모든 브라우저 공통) */
     .pill{
-  padding:2px 9px 4px;   /* 위 2px, 아래 4px → 글자가 살짝 위로 올라간 느낌 */
-  border-radius:999px;
-  font-weight:800;
-  letter-spacing:.5px;
-  white-space:nowrap;
-  font-size:calc(9px * var(--exportScale));
+      padding:4px 9px;
+      border-radius:999px;
+      font-weight:800;
+      letter-spacing:.5px;
+      white-space:nowrap;
+      font-size:calc(9px * var(--exportScale));
 
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  line-height:1;
-}
-
-
-
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+    }
 
     .role-pill{
       background:#eef2ff;
@@ -539,6 +554,17 @@
     }
     .rank-F .card-rank-label {
       text-shadow: -1px 0 #363636, 1px 0 #000, 0 1px #000, 0 -1px #000, 0 0 6px rgb(115 87 17 / 90%);
+    }
+
+    /* ========================= */
+    /*   iOS + Mac Safari 보정   */
+    /* ========================= */
+    .is-ios .pill{
+      padding:2px 9px 4px;   /* 위 살짝 줄이고 아래 늘려서 글자 시각적 중앙 ↑ */
+    }
+
+    .is-ios .badge-role-name{
+      padding:2px 8px 4px;
     }
 
     @media (max-width:768px){
