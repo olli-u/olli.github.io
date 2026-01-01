@@ -8,20 +8,19 @@
   <!-- iOS(아이폰/아이패드) + Mac Safari 감지 -->
   <script>
     (function () {
-  var ua = navigator.userAgent || navigator.vendor || window.opera;
+      var ua = navigator.userAgent || navigator.vendor || window.opera;
 
-  // iOS (iPhone / iPad / iPod)
-  var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      // iOS (iPhone / iPad / iPod)
+      var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
 
-  // 맥 전체 (브라우저 가리지 않고)
-  var isMac = /Macintosh|Mac OS X/.test(ua);
+      // 맥 전체 (브라우저 가리지 않고)
+      var isMac = /Macintosh|Mac OS X/.test(ua);
 
-  // iOS + Mac 이면 전부 보정 클래스 적용
-  if (isIOS || isMac) {
-    document.documentElement.classList.add('is-ios');
-  }
-})();
-
+      // iOS + Mac 이면 전부 보정 클래스 적용
+      if (isIOS || isMac) {
+        document.documentElement.classList.add('is-ios');
+      }
+    })();
   </script>
 
   <!-- DOM -> 이미지 캡쳐 -->
@@ -152,8 +151,7 @@
       margin-top:2px;
     }
     h2 {
-        color:#9ca3af;
-
+      color:#9ca3af;
     }
     .scale-row{
       display:flex;
@@ -563,7 +561,7 @@
     /*   iOS + Mac Safari 보정   */
     /* ========================= */
     .is-ios .pill{
-      padding:2px 9px 4px;   /* 위 살짝 줄이고 아래 늘려서 글자 시각적 중앙 ↑ */
+      padding:2px 9px 4px;
     }
 
     .is-ios .badge-role-name{
@@ -645,6 +643,20 @@
         <input type="file" id="imageInput" accept="image/png,image/*">
         <div class="hint">흰색 배경의 이미지를 업로드 하면 자동으로 배경이 지워지지만, 직접 배경을 지운 png 이미지를 사용하시는 것을 권장합니다.</div>
       </div>
+      <div class="form-group">
+        <label>흰색 자동 제거 옵션</label>
+        <label style="display:flex;align-items:center;gap:6px;color:#e5e7eb;font-size:11px;">
+          <input type="checkbox" id="removeWhite" checked>
+          흰색(밝은 배경) 자동 제거
+        </label>
+      </div>
+      <div class="form-group">
+        <label>배경 제거 색상 🎨</label>
+        <div class="form-row">
+          <input type="color" id="chromaColor" value="#00ff00">
+          <input type="range" id="chromaTol" min="0" max="80" value="35">
+        </div>
+      </div>
 
       <div class="form-group">
         <label>2. 이름</label>
@@ -718,38 +730,44 @@
 </div>
 
 <script>
-  const imageInput = document.getElementById('imageInput');
-  const cardWrapper = document.getElementById('cardWrapper');
-  const cardBorder = document.getElementById('cardBorder');
-  const charInner = document.getElementById('charInner');
-  const charImg = document.getElementById('charImg');
+  const imageInput   = document.getElementById('imageInput');
+  const cardWrapper  = document.getElementById('cardWrapper');
+  const cardBorder   = document.getElementById('cardBorder');
+  const charInner    = document.getElementById('charInner');
+  const charImg      = document.getElementById('charImg');
 
-  const nameKoInput = document.getElementById('nameKo');
-  const nameEnInput = document.getElementById('nameEn');
-  const roleSelect = document.getElementById('roleSelect');
-  const rankSelect = document.getElementById('rankSelect');
+  const nameKoInput  = document.getElementById('nameKo');
+  const nameEnInput  = document.getElementById('nameEn');
+  const roleSelect   = document.getElementById('roleSelect');
+  const rankSelect   = document.getElementById('rankSelect');
 
-  const emoji1Input = document.getElementById('emoji1');
-  const emoji2Input = document.getElementById('emoji2');
-  const emoji3Input = document.getElementById('emoji3');
+  const emoji1Input  = document.getElementById('emoji1');
+  const emoji2Input  = document.getElementById('emoji2');
+  const emoji3Input  = document.getElementById('emoji3');
 
-  const rankLabel = document.getElementById('rankLabel');
-  const roleBadge = document.getElementById('roleBadge');
-  const nameKoLabel = document.getElementById('nameKoLabel');
-  const nameSub = document.getElementById('nameSub');
-  const rolePill = document.getElementById('rolePill');
-  const dangerPill = document.getElementById('dangerPill');
+  const rankLabel    = document.getElementById('rankLabel');
+  const roleBadge    = document.getElementById('roleBadge');
+  const nameKoLabel  = document.getElementById('nameKoLabel');
+  const nameSub      = document.getElementById('nameSub');
+  const rolePill     = document.getElementById('rolePill');
+  const dangerPill   = document.getElementById('dangerPill');
 
-  const emojiSlot1 = document.getElementById('emojiSlot1');
-  const emojiSlot2 = document.getElementById('emojiSlot2');
-  const emojiSlot3 = document.getElementById('emojiSlot3');
+  const emojiSlot1   = document.getElementById('emojiSlot1');
+  const emojiSlot2   = document.getElementById('emojiSlot2');
+  const emojiSlot3   = document.getElementById('emojiSlot3');
 
-  const scaleRange = document.getElementById('scaleRange');
+  const scaleRange   = document.getElementById('scaleRange');
   const offsetXRange = document.getElementById('offsetXRange');
   const offsetYRange = document.getElementById('offsetYRange');
 
-  const saveJpgBtn = document.getElementById('saveJpgBtn');
-  const saveGifBtn = document.getElementById('saveGifBtn');
+  const saveJpgBtn   = document.getElementById('saveJpgBtn');
+  const saveGifBtn   = document.getElementById('saveGifBtn');
+
+  const chromaColor  = document.getElementById('chromaColor');
+  const chromaTol    = document.getElementById('chromaTol');
+
+  // 흰색 자동 제거 체크박스 (없어도 에러 안 나게)
+  const removeWhite  = document.getElementById('removeWhite');
 
   const rankClasses = ['rank-SS','rank-S','rank-A','rank-B','rank-C','rank-D','rank-F'];
 
@@ -766,19 +784,89 @@
   };
 
   // ===== 위치/크기 상태값 =====
-  let currentScale = parseFloat(scaleRange.value);
-  let currentOffsetX = parseFloat(offsetXRange.value); // px
-  let currentOffsetY = parseFloat(offsetYRange.value); // px
+  let currentScale   = parseFloat(scaleRange.value);
+  let currentOffsetX = parseFloat(offsetXRange.value);
+  let currentOffsetY = parseFloat(offsetYRange.value);
 
   function updateCharTransform() {
     charInner.style.transform =
       `translate(calc(-50% + ${currentOffsetX}px), ${currentOffsetY}px) scale(${currentScale})`;
   }
 
-  // 초기 transform 세팅
   updateCharTransform();
 
-  // ===== 배경 제거 + IMG src로 넣기 =====
+  // ===== 업로드된 원본 이미지를 보관 =====
+  let originalImg = null;
+
+  // 실제 크로마키 적용 함수 (업로드/컬러변경/슬라이더 변경시 공용)
+  function applyChromaKey() {
+    if (!originalImg) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width  = originalImg.width;
+    canvas.height = originalImg.height;
+
+    ctx.drawImage(originalImg, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    // 컬러피커 값 + 톨러런스
+    let targetR = 0, targetG = 255, targetB = 0;
+    let tol = 40;
+    let useChroma = false;
+
+    if (chromaColor && chromaColor.value && chromaColor.value.length === 7) {
+      const hex = chromaColor.value; // "#rrggbb"
+      targetR = parseInt(hex.slice(1,3), 16);
+      targetG = parseInt(hex.slice(3,5), 16);
+      targetB = parseInt(hex.slice(5,7), 16);
+      useChroma = true;
+    }
+
+    if (chromaTol && chromaTol.value) {
+      tol = parseInt(chromaTol.value, 10);
+      if (isNaN(tol)) tol = 40;
+    }
+
+    // removeWhite 체크박스가 없으면 기본적으로 "켜진 상태"로 간주
+    const removeWhiteEnabled = !removeWhite || removeWhite.checked;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      let shouldRemove = false;
+
+      // 🔹 (옵션 ON일 때만) 흰색 배경 제거
+      if (removeWhiteEnabled) {
+        const isAlmostWhite = (r > 240 && g > 240 && b > 240);
+        if (isAlmostWhite) shouldRemove = true;
+      }
+
+      // 🔹 컬러피커 기반 제거
+      if (useChroma) {
+        const dr = Math.abs(r - targetR);
+        const dg = Math.abs(g - targetG);
+        const db = Math.abs(b - targetB);
+        if (dr <= tol && dg <= tol && db <= tol) {
+          shouldRemove = true;
+        }
+      }
+
+      if (shouldRemove) {
+        data[i + 3] = 0; // 투명
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+    const url = canvas.toDataURL('image/png');
+    charImg.src = url;
+  }
+
+  // ===== 이미지 업로드 이벤트 =====
   imageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -787,43 +875,33 @@
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-
-          const isAlmostWhite = (r > 240 && g > 240 && b > 240);
-          const isGreenScreen = (g > 120 && g > r + 30 && g > b + 30);
-
-          if (isAlmostWhite || isGreenScreen) {
-            data[i + 3] = 0;
-          }
-        }
-
-        ctx.putImageData(imageData, 0, 0);
-        const url = canvas.toDataURL('image/png');
-        charImg.src = url;
+        originalImg = img;   // 원본 저장
+        applyChromaKey();    // 현재 컬러피커/톨러런스/체크박스로 바로 한번 적용
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   });
 
+  // 🎨 컬러피커/슬라이더/체크박스 움직여도 즉시 다시 적용되게 연결
+  if (chromaColor) {
+    chromaColor.addEventListener('input', applyChromaKey);
+    chromaColor.addEventListener('change', applyChromaKey);
+  }
+  if (chromaTol) {
+    chromaTol.addEventListener('input', applyChromaKey);
+    chromaTol.addEventListener('change', applyChromaKey);
+  }
+  if (removeWhite) {
+    removeWhite.addEventListener('change', applyChromaKey);
+  }
+
   // ===== 카드 텍스트 / 스타일 =====
   function refreshCard(){
     const nameKo = (nameKoInput.value || '테이저').trim();
     const nameEn = (nameEnInput.value || 'Taser').trim();
-    const rank = rankSelect.value;
-    const role = roleSelect.value;
+    const rank   = rankSelect.value;
+    const role   = roleSelect.value;
 
     const roleKor = roleKorMap[role];
     const roleEng = roleEngMap[role];
@@ -837,7 +915,7 @@
     nameKoLabel.textContent = nameKo;
     nameSub.textContent = `${nameEn} · ${rank}급 초능력 보유 ${roleKor}`;
 
-    rolePill.textContent = 'ROLE · ' + roleEng;
+    rolePill.textContent   = 'ROLE · ' + roleEng;
     dangerPill.textContent = 'DANGER · ' + rank;
 
     emojiSlot1.textContent = (emoji1Input.value || '💦').trim() || '💦';
@@ -845,15 +923,15 @@
     emojiSlot3.textContent = (emoji3Input.value || '🏠').trim() || '🏠';
   }
 
-  nameKoInput.addEventListener('input', refreshCard);
-  nameEnInput.addEventListener('input', refreshCard);
-  roleSelect.addEventListener('change', refreshCard);
-  rankSelect.addEventListener('change', refreshCard);
-  emoji1Input.addEventListener('input', refreshCard);
-  emoji2Input.addEventListener('input', refreshCard);
-  emoji3Input.addEventListener('input', refreshCard);
+  nameKoInput.addEventListener('input',   refreshCard);
+  nameEnInput.addEventListener('input',   refreshCard);
+  roleSelect.addEventListener('change',   refreshCard);
+  rankSelect.addEventListener('change',   refreshCard);
+  emoji1Input.addEventListener('input',   refreshCard);
+  emoji2Input.addEventListener('input',   refreshCard);
+  emoji3Input.addEventListener('input',   refreshCard);
 
-  // ===== 이미지 크기 / 위치 조절 (IMG용) =====
+  // ===== 이미지 크기 / 위치 조절 =====
   scaleRange.addEventListener('input', (e) => {
     currentScale = parseFloat(e.target.value);
     updateCharTransform();
@@ -871,7 +949,6 @@
 
   async function downloadJpg() {
     const nameEn = (nameEnInput.value || 'card').trim() || 'card';
-
     const exportScale = 2;
 
     const baseCanvas = await html2canvas(cardBorder, {
@@ -886,7 +963,7 @@
     const paddingY = 20 * exportScale;
 
     const finalCanvas = document.createElement('canvas');
-    finalCanvas.width = baseCanvas.width + paddingX * 2;
+    finalCanvas.width  = baseCanvas.width  + paddingX * 2;
     finalCanvas.height = baseCanvas.height + paddingY * 2;
 
     const ctx = finalCanvas.getContext('2d');
@@ -915,7 +992,7 @@
     const nameEn = (nameEnInput.value || 'card').trim() || 'card';
 
     const rect = cardBorder.getBoundingClientRect();
-    const width = Math.round(rect.width * 2);
+    const width  = Math.round(rect.width  * 2);
     const height = Math.round(rect.height * 2);
 
     const gif = new GIF({
@@ -940,7 +1017,7 @@
     }
 
     gif.on('finished', (blob) => {
-      const url = URL.createObjectURL(blob);
+      const url  = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.download = `${nameEn}_card.gif`;
@@ -959,5 +1036,7 @@
 
   refreshCard();
 </script>
+
+
 </body>
 </html>
