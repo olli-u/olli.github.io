@@ -114,7 +114,9 @@
       font-size:11px;
       outline:none;
     }
-
+    input[type="text"] {
+        font-size: 16px !important;
+    }
     input[type="file"]{
       width:100%;
       font-size:11px;
@@ -499,9 +501,9 @@
 
     /* D: 흰색 계열 */
     .rank-D{
-      --rankBorder1:#e5e7eb;
+      --rankBorder1:#cbd9f6;
       --rankBorder2:#f3f4f6;
-      --rankBorder3:#ffffff;
+      --rankBorder3:#9bbef4;
       --rankColor:#e5e7eb;
       --rankColorSoft:#ffffff;
       --dangerBg:#f9fafb;
@@ -598,8 +600,8 @@
       <div class="form-group">
         <label>2. 이름</label>
         <div class="form-row">
-          <input type="text" id="nameKo" placeholder="한글 이름 (예: 테이저)">
-          <input type="text" id="nameEn" placeholder="영문 이름 (예: Taser)">
+          <input type="text" id="nameKo" placeholder="한글 이름">
+          <input type="text" id="nameEn" placeholder="영문 이름">
         </div>
       </div>
 
@@ -659,7 +661,7 @@
         <label>7. 카드 저장</label>
         <div class="form-row">
           <button type="button" id="saveJpgBtn" class="btn-save">JPG 저장</button>
-          <button type="button" id="saveGifBtn" class="btn-save">GIF 저장(움짤)</button>
+          <button type="button" id="saveGifBtn" class="btn-save" style="display: none;">GIF 저장(움짤)</button>
         </div>
       </div>
     </section>
