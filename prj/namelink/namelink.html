@@ -1,9 +1,13 @@
 <!doctype html>
 <html lang="ko">
 <head>
+  
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>NAME LINK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#0b1220;
@@ -22,9 +26,15 @@
     *{box-sizing:border-box}
 
     html{scroll-behavior:smooth;}
+    .nanum-gothic-regular {
+  font-family: "Nanum Gothic", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Nanum Gothic", "Apple SD Gothic Neo", "Noto Sans KR", Segoe UI, Roboto, Arial, sans-serif;
       background:
         radial-gradient(1200px 700px at 10% -10%, rgba(124,58,237,.22), transparent 60%),
         radial-gradient(900px 560px at 92% 0%, rgba(197, 34, 34, 0.18), transparent 55%),
@@ -449,6 +459,110 @@
     .segBtn b{ font-size:13px; letter-spacing:-.2px; }
     #resetBtn {padding: 11px 15px;}
     #stickyCountNow {display: none;}
+
+    /* ===== Link wrap (top quick links) ===== */
+.link-wrap{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin: 10px 0 14px;
+
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,.16);
+  background: rgba(15,23,42,.62);
+  box-shadow: 0 18px 45px rgba(0,0,0,.35);
+  backdrop-filter: blur(16px) saturate(1.12);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 은은한 컬러 안개 */
+.link-wrap::before{
+  content:"";
+  position:absolute;
+  inset:-60% -30%;
+  background:
+    radial-gradient(520px 220px at 18% 55%, rgba(124,58,237,.22), transparent 60%),
+    radial-gradient(520px 220px at 78% 40%, rgba(59,130,246,.16), transparent 62%),
+    radial-gradient(520px 220px at 65% 75%, rgba(34,197,94,.10), transparent 60%);
+  opacity:.8;
+  filter: blur(10px);
+  pointer-events:none;
+}
+.link-wrap > *{ position:relative; }
+
+/* 작은 타이틀 배지 */
+.link-wrap .link-title{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,.16);
+  background: rgba(0,0,0,.12);
+  color: rgba(148,163,184,.92);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  user-select:none;
+  white-space:nowrap;
+}
+
+/* 링크 버튼 느낌 */
+.link-wrap a{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: rgba(15,23,42,.50);
+
+  text-decoration: none;
+  color: rgba(229,231,235,.92);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -.15px;
+
+  transition: transform .12s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease;
+  backdrop-filter: blur(14px) saturate(1.12);
+}
+
+.link-wrap a .sub{
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(148,163,184,.9);
+  letter-spacing: .02em;
+}
+
+.link-wrap a:hover{
+  border-color: rgba(124,58,237,.55);
+  background: rgba(15,23,42,.66);
+  box-shadow: 0 0 0 4px rgba(124,58,237,.14);
+  transform: translateY(-1px);
+}
+.link-wrap a:active{ transform: translateY(0); }
+
+.link-wrap a::after{
+  content:"↗";
+  font-size: 12px;
+  opacity: .75;
+  transform: translateY(-.5px);
+}
+
+/* 모바일: 둥근 패널은 유지, 줄바꿈 자연스럽게 */
+@media (max-width: 520px){
+  .link-wrap{
+    border-radius: 16px;
+    padding: 10px;
+  }
+  .link-wrap .link-title{ width:100%; justify-content:center; }
+  .link-wrap a{ flex: 1 1 auto; justify-content:center; }
+}
+
   </style>
 </head>
 <body>
@@ -471,7 +585,21 @@
         <h1>캐릭터 목록</h1>
       </div>
     </header>
-
+    <div class="link-wrap" aria-label="Quick links">    
+      <a href="https://olli-u.github.io/olli.github.io/prj/namelink/namelink_card.html" target="_blank" rel="noopener">
+        Card Maker
+      </a>
+    
+      <a href="https://youtu.be/8zknkrX4nVM?si=5sZ1XYQ13UKe9lo5" target="_blank" rel="noopener">
+        Fan-made song
+      </a>
+    
+      <a href="https://x.com/NAMELINK_" target="_blank" rel="noopener">
+        X 
+      </a>
+    </div>
+    
+    
     <div class="controls" id="controls">
       <div class="group">
         <label class="chip"><input type="checkbox" id="filterHero" checked><b>Hero</b></label>
