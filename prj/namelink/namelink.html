@@ -566,6 +566,145 @@
   transform: translateY(-.5px);
 }
 
+.linkBtn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: rgba(15,23,42,.50);
+  text-decoration: none;
+  color: rgba(229,231,235,.92);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -.15px;
+  transition: transform .12s ease, border-color .12s ease, background .12s ease, box-shadow .12s ease;
+  backdrop-filter: blur(14px) saturate(1.12);
+  cursor:pointer;
+}
+.linkBtn:hover{
+  border-color: rgba(124,58,237,.55);
+  background: rgba(15,23,42,.66);
+  box-shadow: 0 0 0 4px rgba(124,58,237,.14);
+  transform: translateY(-1px);
+}
+.linkBtn:active{ transform: translateY(0); }
+.linkBtn::after{
+  content:"↗";
+  font-size: 12px;
+  opacity: .75;
+  transform: translateY(-.5px);
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  z-index: 10000;
+}
+.modal.show{ display:block; }
+
+.modalDim{
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+}
+
+.modalPanel{
+  position:relative;
+  max-width: 720px;
+  margin: 60px auto;
+  background: rgba(15,23,42,.86);
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.55);
+  overflow:hidden;
+  padding: 14px;
+}
+
+.modalHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding: 8px 8px 12px;
+  border-bottom: 1px solid rgba(148,163,184,.14);
+}
+.modalTitle{
+  font-weight: 900;
+  letter-spacing: -.2px;
+  font-size: 15px;
+}
+.modalClose{
+  border:1px solid rgba(148,163,184,.18);
+  background: rgba(0,0,0,.18);
+  color: rgba(229,231,235,.9);
+  border-radius: 12px;
+  padding: 8px 10px;
+  cursor:pointer;
+}
+.modalClose:hover{ border-color: rgba(124,58,237,.55); }
+
+.songList{
+  padding: 12px 6px 6px;
+  display:grid;
+  gap:10px;
+}
+.songItem{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,.16);
+  background: rgba(17,25,55,.45);
+}
+.songLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+.songName{
+  font-weight: 900;
+  font-size: 13px;
+  white-space:nowrap;
+}
+.songMeta{
+  color: rgba(148,163,184,.9);
+  font-size: 12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width: 320px;
+}
+.songGo{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border:1px solid rgba(148,163,184,.18);
+  background: rgba(15,23,42,.55);
+  color: rgba(229,231,235,.92);
+  text-decoration:none;
+  font-size: 12px;
+  font-weight: 900;
+  white-space:nowrap;
+}
+.songGo:hover{
+  border-color: rgba(124,58,237,.55);
+  box-shadow: 0 0 0 4px rgba(124,58,237,.12);
+}
+@media (max-width: 520px){
+  .modalPanel{ margin: 16px; }
+  .songMeta{ display:none; }
+}
+
+
 /* 모바일: 둥근 패널은 유지, 줄바꿈 자연스럽게 */
 @media (max-width: 520px){
   .link-wrap{
@@ -603,9 +742,9 @@
         Card Maker
       </a>
     
-      <a href="https://youtu.be/8zknkrX4nVM?si=5sZ1XYQ13UKe9lo5" target="_blank" rel="noopener">
+      <button type="button" class="linkBtn" id="fanSongBtn" aria-haspopup="dialog" aria-controls="songModal">
         Fan-made song
-      </a>
+      </button>       
     
       <a href="https://x.com/NAMELINK_" target="_blank" rel="noopener">
         X 
@@ -669,6 +808,30 @@
     </div>
 
     <div class="by"> Webpage made by. 𝕏 @Olli_mine </div>
+
+    <div class="modal" id="songModal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="modalDim" id="songModalDim"></div>
+      <div class="modalPanel" role="document">
+        <div class="modalHead">
+          <div class="modalTitle" id="songModalTitle">Fan-made songs</div>
+          <button type="button" class="modalClose" id="songModalClose">Close</button>
+        </div>
+        <div class="songList">
+          <div style="
+          font-size: 14px;
+          text-align: right;
+      ">Thanks to Pink lady</div>
+                <div class="songItem">
+            <div class="songLeft">
+              <span class="songName">NAME ON MY SKIN</span>
+            </div>
+            <a class="songGo" href="https://www.youtube.com/watch?v=8zknkrX4nVM" target="_blank" rel="noopener">YouTube ↗</a>
+          </div>
+        </div>
+        <div class="songList" id="songList" style="padding-top: 6px !important;"></div>
+      </div>
+    </div>
+    
   </div>
 
   <script>
@@ -723,13 +886,21 @@
     };
 
     const characters = [
-      { id:"segye", codename:"SEGYE", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/0a49bfad-72b8-4d1f-99fa-f538c3695e36?v=2b762f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/3a33623f-a3fa-4b00-af45-4b6a41575018?v=c51e11", link:"https://caveduck.io/character-info/d9a5cbce-81d9-41c7-99d5-491f442c9bef?locale=ko" },
-      { id:"pawn", codename:"PAWN", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/ce1780f7-b1d5-449d-839c-4ab85ae0a7d9?v=9da22e", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/26143cc5-6914-4400-88b3-8346bfac522b?v=55407b", link:"https://caveduck.io/character-info/98bdb403-5e65-4fdb-b000-72586bc74c1b?locale=ko" },
-      { id:"cheat", codename:"CHEAT", position:"villain", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a0ade898-2418-4600-97f0-2bcacee69442?v=a8522f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/anim=true,dpr=2,f=auto,w=800/charim/97b6033a-d6c9-49c8-984c-8887c84f127d", link:"https://caveduck.io/character-info/b9306c5a-58af-42d2-9345-f19332b71a6a?locale=ko" },
+      { id:"segye", codename:"SEGYE", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/0a49bfad-72b8-4d1f-99fa-f538c3695e36?v=2b762f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/3a33623f-a3fa-4b00-af45-4b6a41575018?v=c51e11", link:"https://caveduck.io/character-info/d9a5cbce-81d9-41c7-99d5-491f442c9bef?locale=ko" , fanSongs:[
+    { title:"MINE, ALL MINE", url:"https://www.youtube.com/watch?v=luMN0KYvEuM" },
+  ]},
+      { id:"pawn", codename:"PAWN", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/ce1780f7-b1d5-449d-839c-4ab85ae0a7d9?v=9da22e", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/26143cc5-6914-4400-88b3-8346bfac522b?v=55407b", link:"https://caveduck.io/character-info/98bdb403-5e65-4fdb-b000-72586bc74c1b?locale=ko", fanSongs:[
+    { title:"Not Your Fate", url:"https://www.youtube.com/watch?v=ph_66gInglg" },
+  ] },
+      { id:"cheat", codename:"CHEAT", position:"villain", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a0ade898-2418-4600-97f0-2bcacee69442?v=a8522f", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/anim=true,dpr=2,f=auto,w=800/charim/97b6033a-d6c9-49c8-984c-8887c84f127d", link:"https://caveduck.io/character-info/b9306c5a-58af-42d2-9345-f19332b71a6a?locale=ko", fanSongs:[
+    { title:"ACCEPT ERROR", url:"https://www.youtube.com/watch?v=tsNATyDIgUI" },
+  ] },
       { id:"taser", codename:"TASER", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/61cc164e-dd55-489a-b5dd-5ade20ace30a?v=eb676a", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/79260c15-bf1d-4a1b-a844-2d0eb362ae68?v=e9df21", link:"https://caveduck.io/character-info/0412c19b-7346-46b2-9a35-fa973d07441c?locale=ko" },
       { id:"ise", codename:"ISE", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/70d9f1aa-53ea-4b53-8e92-e6d05f18a845?v=96967e", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/bf39d591-05a6-4d1c-b31a-342460e098bd?v=0844b8", link:"https://caveduck.io/character-info/d631031e-7baf-44e4-b91b-48b7dc298517?locale=ko" },
       { id:"zeno", codename:"ZENO", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/6fd77199-3a9d-4d0b-8247-876a3e494b0b?v=73b7b0", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim/a8d4a931-f9ea-450d-b5ce-76d8bb5af655?v=583ed5", link:"https://caveduck.io/character-info/4f288a42-afe3-472f-b7c2-a493b2f7c4f3?locale=ko" },
-      { id:"night", codename:"NIGHT", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/1b988c39-3e48-4c7e-93d0-1cbd28905beb?v=dde7e2", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/04f9a9e8-62f1-49e9-8ba2-cf30fb9af4d9?v=dd69fc", link:"https://ko.cvdk.io/c/xTMylTThSgWNs0u_6Ry9jA?rc=LvfvJ2VLoI" },
+      { id:"night", codename:"NIGHT", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/1b988c39-3e48-4c7e-93d0-1cbd28905beb?v=dde7e2", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/04f9a9e8-62f1-49e9-8ba2-cf30fb9af4d9?v=dd69fc", link:"https://ko.cvdk.io/c/xTMylTThSgWNs0u_6Ry9jA?rc=LvfvJ2VLoI", fanSongs:[
+    { title:"Pressure Without Sound", url:"https://www.youtube.com/watch?v=VGdDQx4mKAg" },
+  ]},
       { id:"lian", codename:"LIAN", position:"villain", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/a3820801-0b3e-4e26-94c9-3d11866bea72?v=d95011", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/8e795f88-0ffe-4b1c-9ff3-078c6c1615ff?v=3c2de3", link:"https://ko.cvdk.io/c/QJzCKOVBQHOZiMV8Lsv9Xw?rc=LvfvJ2VLoI"},
       { id:"skill", codename:"SKILL", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/6e1f0024-613e-4516-a219-90201866ff7e?v=85a382", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/e41608fb-cd7c-4ce2-be86-b2c9027a4992?v=113f4b", link:"https://ko.cvdk.io/c/Swd7oXJPQUaOPZv0lhL-hA?rc=LvfvJ2VLoI" },
       { id:"facade", codename:"FACADE", position:"normal", grade:"D", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/31e043d3-7fe5-4e69-bd76-471551d2e6af?v=8e81cc", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/6e2687d9-6b4c-4376-9572-71fc655d2927?v=f63804", link:"https://ko.cvdk.io/c/9gerbemnT2Gaaqmkr5xRsw?rc=LvfvJ2VLoI" },
@@ -1144,6 +1315,61 @@
       syncSortToggleUI();
       initSticky();
     }
+    const fanSongBtn = document.getElementById("fanSongBtn");
+const songModal = document.getElementById("songModal");
+const songModalDim = document.getElementById("songModalDim");
+const songModalClose = document.getElementById("songModalClose");
+const songList = document.getElementById("songList");
+const songModalTitle = document.getElementById("songModalTitle");
+
+function openSongModal(){
+  const titleText = isKo ? "Fan-made songs" : "Fan-made songs";
+  songModalTitle.textContent = titleText;
+
+  const rows = [];
+  for (const c of characters){
+    if (!c.fanSongs || !c.fanSongs.length) continue;
+    for (const s of c.fanSongs){
+      rows.push({ codename: c.codename, position: c.position, title: s.title, url: s.url });
+    }
+  }
+
+  if (!rows.length){
+    songList.innerHTML = `<div class="empty" style="margin:0;">${isKo ? "등록된 팬메이드 송이 없어 😭" : "No fan-made songs yet 😭"}</div>`;
+  } else {
+    songList.innerHTML = rows.map(r => `
+      <div class="songItem">
+        <div class="songLeft">
+          <span class="songName">${escapeHtml(r.codename)}</span>
+          <span class="songMeta">${escapeHtml(r.title)}</span>
+        </div>
+        <a class="songGo" href="${r.url}" target="_blank" rel="noopener">YouTube ↗</a>
+      </div>
+    `).join("");
+  }
+
+  songModal.classList.add("show");
+  songModal.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSongModal(){
+  songModal.classList.remove("show");
+  songModal.setAttribute("aria-hidden","true");
+  document.body.style.overflow = "";
+}
+
+if (fanSongBtn){
+  fanSongBtn.addEventListener("click", openSongModal);
+}
+songModalClose.addEventListener("click", closeSongModal);
+songModalDim.addEventListener("click", closeSongModal);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && songModal.classList.contains("show")){
+    closeSongModal();
+  }
+});
 
     init();
   </script>
