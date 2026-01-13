@@ -379,6 +379,7 @@
     }
     .badge.hero{border-color: rgba(34,197,94,.45)}
     .badge.villain{border-color: rgba(239,68,68,.45)}
+    .badge.normal{border-color: rgba(229,231,235,.50); background: rgba(229,231,235,.06); color: rgba(229,231,235,.92);}
     .badge.grade{border-color: rgba(124,58,237,.45)}
 
     .body{
@@ -411,6 +412,7 @@
     }
     .mini.hero {border-color: rgba(69,125,255,.6)}
     .mini.villain {border-color: rgba(255,0,0,.55)}
+    .mini.normal {border-color: rgba(229,231,235,.55); background: rgba(229,231,235,.06); color: rgba(229,231,235,.92);}
     .hl{
       background: linear-gradient(180deg, rgba(124,58,237,.0) 35%, rgba(124,58,237,.35) 35%, rgba(124,58,237,.35) 88%, rgba(124,58,237,.0) 88%);
       color: var(--txt);
@@ -615,6 +617,7 @@
       <div class="group">
         <label class="chip"><input type="checkbox" id="filterHero" checked><b>Hero</b></label>
         <label class="chip"><input type="checkbox" id="filterVillain" checked><b>Villain</b></label>
+        <label class="chip"><input type="checkbox" id="filterNormal" checked><b>Normal</b></label>
       </div>
 
       <div class="spacer"></div>
@@ -676,6 +679,7 @@
     const TEXT = isKo ? {
       hero: "히어로",
       villain: "빌런",
+      normal: "노말",
       thumbnail: "썸네일",
       thumbMain: "메인",
       thumbId: "ID",
@@ -697,6 +701,7 @@
     } : {
       hero: "Hero",
       villain: "Villain",
+      normal: "Normal",
       thumbnail: "Thumbnail",
       thumbMain: "MAIN",
       thumbId: "ID",
@@ -727,9 +732,12 @@
       { id:"night", codename:"NIGHT", position:"villain", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/1b988c39-3e48-4c7e-93d0-1cbd28905beb?v=dde7e2", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/04f9a9e8-62f1-49e9-8ba2-cf30fb9af4d9?v=dd69fc", link:"https://ko.cvdk.io/c/xTMylTThSgWNs0u_6Ry9jA?rc=LvfvJ2VLoI" },
       { id:"lian", codename:"LIAN", position:"villain", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/a3820801-0b3e-4e26-94c9-3d11866bea72?v=d95011", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/8e795f88-0ffe-4b1c-9ff3-078c6c1615ff?v=3c2de3", link:"https://ko.cvdk.io/c/QJzCKOVBQHOZiMV8Lsv9Xw?rc=LvfvJ2VLoI"},
       { id:"skill", codename:"SKILL", position:"hero", grade:"S", thumb:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/6e1f0024-613e-4516-a219-90201866ff7e?v=85a382", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/e41608fb-cd7c-4ce2-be86-b2c9027a4992?v=113f4b", link:"https://ko.cvdk.io/c/Swd7oXJPQUaOPZv0lhL-hA?rc=LvfvJ2VLoI" },
-      { id:"facade", codename:"FACADE", position:"hero", grade:"D", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/31e043d3-7fe5-4e69-bd76-471551d2e6af?v=8e81cc", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/6e2687d9-6b4c-4376-9572-71fc655d2927?v=f63804", link:"https://ko.cvdk.io/c/9gerbemnT2Gaaqmkr5xRsw?rc=LvfvJ2VLoI" },
+      { id:"facade", codename:"FACADE", position:"normal", grade:"D", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/31e043d3-7fe5-4e69-bd76-471551d2e6af?v=8e81cc", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/6e2687d9-6b4c-4376-9572-71fc655d2927?v=f63804", link:"https://ko.cvdk.io/c/9gerbemnT2Gaaqmkr5xRsw?rc=LvfvJ2VLoI" },
       { id:"void", codename:"VOID", position:"hero", grade:"SS", thumb:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/8cd07eac-35f9-4066-b569-420e911cc8da?v=a7542b", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,fit=crop,g=top,w=500/charim-standard/6ff050e9-c75c-4aa4-b84b-cf1d6a4f31ce?v=50c6a9", link:"https://ko.cvdk.io/c/PjRVOrcqQ5aCvmE-Pbhk4Q?rc=LvfvJ2VLoI" },
+      { id:"claude", codename:"CLAUDE", position:"normal", grade:"D", thumb:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/ce0ea3a9-2a68-4121-acc3-1c0dffd5eb52?v=d7fef1", thumbId:"https://cdn.caveduck.io/cdn-cgi/image/f=auto,fit=crop,g=top,w=500/charim-standard/8d4a4b6a-bcac-4d9d-a07c-d6c61a761086?v=775ff8", link:"https://ko.cvdk.io/c/mIFePIFYSpmapVmqA3KAsQ?rc=LvfvJ2VLoI" },
       { id:"soon_villain2", codename:"?", position:"villain", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
+      { id:"soon_normal1", codename:"?", position:"normal", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
+      { id:"soon_hero1", codename:"?", position:"hero", grade:"?", comingSoon:true, thumb:null, thumbId:null, link:"#"},
     ];
 
     const gradeRank = { "SS": 7, "S": 6, "A": 5, "B": 4, "C": 3, "D": 2, "F": 1 };
@@ -740,6 +748,7 @@
 
     const filterHero = $("#filterHero");
     const filterVillain = $("#filterVillain");
+    const filterNormal = $("#filterNormal");
     const searchInput = $("#searchInput");
     const clearSearch = $("#clearSearch");
 
@@ -770,33 +779,26 @@
     const segTags = document.querySelectorAll(".segTag");
 
     function applyLanguageStaticTexts(){
-      // 필터 라벨
       filterHero.parentElement.querySelector("b").textContent = TEXT.hero;
       filterVillain.parentElement.querySelector("b").textContent = TEXT.villain;
+      filterNormal.parentElement.querySelector("b").textContent = TEXT.normal;
 
-      // 썸네일 토글 라벨
       toggleLabelEl.textContent = TEXT.thumbnail;
       thumbModeText.textContent = TEXT.thumbMain;
 
-      // 검색 placeholder
       searchInput.placeholder = TEXT.searchPlaceholder;
       clearSearch.setAttribute("aria-label", isKo ? "검색어 지우기" : "Clear search query");
 
-      // 정렬/방향 태그
       if (segTags[0]) segTags[0].textContent = TEXT.sortTag;
       if (segTags[1]) segTags[1].textContent = TEXT.orderTag;
 
-      // 리셋 버튼
       resetBtn.textContent = TEXT.reset;
 
-      // 메타 라벨
       metaLabelShown.textContent = TEXT.shownPrefix;
       metaLabelSort.textContent = TEXT.sortPrefix;
 
-      // 빈 상태 메시지
       empty.innerHTML = TEXT.emptyHtml;
 
-      // sticky 헤더 aria
       stickyLogoBtn.setAttribute("aria-label", TEXT.stickyScrollTop);
     }
 
@@ -817,7 +819,11 @@
     };
 
     function normalize(v){ return (v ?? "").toString().trim().toLowerCase(); }
-    function badgeLabel(pos){ return pos === "hero" ? TEXT.hero : TEXT.villain; }
+    function badgeLabel(pos){
+      if (pos === "hero") return TEXT.hero;
+      if (pos === "villain") return TEXT.villain;
+      return TEXT.normal;
+    }
 
     function escapeHtml(str){
       return str.replace(/[&<>"']/g, (m) => ({
@@ -841,10 +847,14 @@
     function getList(){
       const showHero = filterHero.checked;
       const showVillain = filterVillain.checked;
+      const showNormal = filterNormal.checked;
       const q = normalize(searchInput.value);
 
       const filtered = characters.filter(c => {
-        const okPos = (c.position === "hero" && showHero) || (c.position === "villain" && showVillain);
+        const okPos =
+          (c.position === "hero" && showHero) ||
+          (c.position === "villain" && showVillain) ||
+          (c.position === "normal" && showNormal);
         if (!okPos) return false;
         if (!q) return true;
         return normalize(c.codename).includes(q);
@@ -998,18 +1008,17 @@
       state.lastToken++;
       const token = state.lastToken;
 
-const beforeRects = snapshotPositions();
-const oldKeys = new Set(state.prevKeys);
+      const beforeRects = snapshotPositions();
+      const oldKeys = new Set(state.prevKeys);
 
-const nextList = getList();
-const newKeys = new Set(nextList.map(c => c.id || c.codename));
+      const nextList = getList();
+      const newKeys = new Set(nextList.map(c => c.id || c.codename));
 
-const outKeys = [...oldKeys].filter(k => !newKeys.has(k));
-const outEls = [...grid.querySelectorAll(".card")].filter(el =>
-  outKeys.includes(el.dataset.key)
-);
-const wait = animateOut(outEls);
-
+      const outKeys = [...oldKeys].filter(k => !newKeys.has(k));
+      const outEls = [...grid.querySelectorAll(".card")].filter(el =>
+        outKeys.includes(el.dataset.key)
+      );
+      const wait = animateOut(outEls);
 
       clearTimeout(state.rafId);
       state.rafId = setTimeout(() => {
@@ -1085,7 +1094,7 @@ const wait = animateOut(outEls);
       clearSearch.disabled = true;
 
       const onChange = () => renderWithCross();
-      [filterHero, filterVillain, sortKey, sortDir].forEach(el => el.addEventListener("change", onChange));
+      [filterHero, filterVillain, filterNormal, sortKey, sortDir].forEach(el => el.addEventListener("change", onChange));
 
       searchInput.addEventListener("input", () => {
         clearSearch.disabled = !searchInput.value;
@@ -1102,6 +1111,7 @@ const wait = animateOut(outEls);
       resetBtn.addEventListener("click", () => {
         filterHero.checked = true;
         filterVillain.checked = true;
+        filterNormal.checked = true;
         sortKey.value = "grade";
         sortDir.value = "asc";
         searchInput.value = "";
