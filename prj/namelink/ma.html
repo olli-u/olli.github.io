@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Card HTML Editor</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin:0; font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#0b1220; }
+    .wrap { display:flex; gap:14px; padding:14px; box-sizing:border-box; max-width:1300px; margin:0 auto; }
+    .panel {
+      width:360px; min-width:320px; max-width:420px;
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(148,163,184,0.35);
+      border-radius:18px;
+      box-shadow:0 18px 50px rgba(0,0,0,0.35);
+      overflow:hidden;
+      position:sticky; top:14px; align-self:flex-start;
+    }
+    .panel header{
+      padding:14px 14px 10px 14px; background:linear-gradient(135deg,#111827,#0b1220);
+      color:#fff; font-weight:900; letter-spacing:0.5px;
+    }
+    .panel header small{ display:block; opacity:0.75; font-weight:600; margin-top:4px; }
+    .panel .body { padding:12px 12px 14px 12px; box-sizing:border-box; }
+    .row { display:flex; gap:8px; align-items:center; margin:8px 0; }
+    .row label { flex: 0 0 102px; font-size:12px; color:#111827; font-weight:800; }
+    .row input, .row textarea {
+      flex:1 1 auto;
+      font-size:12px; padding:8px 10px; border-radius:12px;
+      border:1px solid rgba(148,163,184,0.7);
+      background:#fff; outline:none;
+    }
+    .row textarea { resize:vertical; min-height:64px; }
+    .btns { display:flex; gap:8px; margin-top:10px; }
+    button{
+      flex:1 1 auto;
+      border:0; border-radius:12px; padding:10px 12px;
+      font-weight:900; cursor:pointer;
+      background:#111827; color:#fff;
+      box-shadow:0 10px 20px rgba(15,23,42,0.25);
+    }
+    button.secondary{ background:#334155; }
+    button:active{ transform: translateY(1px); }
+    .hint{
+      margin-top:10px; padding:10px 10px; border-radius:12px;
+      background:rgba(2,6,23,0.06); color:#0f172a; font-size:12px; line-height:1.5;
+      border:1px dashed rgba(148,163,184,0.9);
+    }
+
+    .stage {
+      flex:1 1 auto;
+      border-radius:18px;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.10), rgba(255,255,255,0.02));
+      border:1px solid rgba(148,163,184,0.18);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+      padding:12px; box-sizing:border-box;
+      overflow:auto;
+    }
+    .stageTop {
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .badge {
+      padding:8px 10px; border-radius:999px;
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(148,163,184,0.28);
+      color:#e5e7eb; font-size:12px; font-weight:800;
+    }
+    .dangerNote { color:#cbd5e1; font-size:12px; opacity:0.85; }
+    .previewShell {
+      background:rgba(255,255,255,0.96);
+      border-radius:18px;
+      padding:12px;
+      box-shadow:0 18px 60px rgba(0,0,0,0.32);
+    }
+
+    /* contenteditable UX */
+    [contenteditable="true"] { outline:none; }
+    [contenteditable="true"]:focus {
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.35);
+      border-radius:10px;
+    }
+    .editableHint {
+      position:absolute; right:10px; bottom:10px;
+      font-size:10px; color:rgba(255,255,255,0.8);
+      background:rgba(2,6,23,0.55);
+      border:1px solid rgba(148,163,184,0.35);
+      padding:4px 8px; border-radius:999px;
+      pointer-events:none;
+    }
+    .toast{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background:rgba(17,24,39,0.92); color:#fff;
+      padding:10px 12px; border-radius:999px;
+      border:1px solid rgba(148,163,184,0.35);
+      box-shadow:0 14px 40px rgba(0,0,0,0.45);
+      font-weight:900; font-size:12px;
+      opacity:0; pointer-events:none;
+      transition: opacity .18s ease;
+    }
+    .toast.on{ opacity:1; }
+    @media (max-width: 900px){
+  .wrap{
+    flex-direction: column;
+    gap: 12px;
+  }
+  .panel{
+    position: relative;
+    top: 0;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+  .stage{
+    width: 100%;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <aside class="panel">
+    <header>
+      공유용 카드 편집기 ✍️
+      <small>이미지 URL + 이모지 변경 + 결과 HTML 복사</small>
+    </header>
+    <div class="body">
+      <div class="row">
+        <label>상단 배경</label>
+        <input id="inFacadeBg" placeholder="https://... (FACADE 상단 배경 이미지 URL)" />
+      </div>
+      <div class="row">
+        <label>FACADE 타이틀</label>
+        <input id="inFacadeTitle" placeholder="FACADE" />
+      </div>
+
+      <div class="row">
+        <label>카드 GIF 패턴</label>
+        <input id="inPatternGif" placeholder="https://... (테두리 패턴 gif)" />
+      </div>
+
+      <div class="row">
+        <label>프로필 배경</label>
+        <input id="inProfileBg" placeholder="https://... (프로필 카드 배경 이미지)" />
+      </div>
+
+      <div class="row">
+        <label>캐릭터 이미지</label>
+        <input id="inCharImg" placeholder="https://... (캐릭터 png/jpg)" />
+      </div>
+
+      <div class="row">
+        <label>중앙 심볼</label>
+        <input id="inSymbolBg" placeholder="https://... (중앙 문양/심볼 이미지)" />
+      </div>
+
+      <div class="row">
+        <label>이모지 1</label>
+        <input id="inEmoji1" placeholder="💦" />
+      </div>
+      <div class="row">
+        <label>이모지 2</label>
+        <input id="inEmoji2" placeholder="🍬" />
+      </div>
+      <div class="row">
+        <label>이모지 3</label>
+        <input id="inEmoji3" placeholder="🏠" />
+      </div>
+
+      <div class="btns">
+        <button id="btnCopy">전체 HTML 복사</button>
+        <button id="btnReset" class="secondary">리셋</button>
+      </div>
+
+      <div class="hint">
+        ✅ 텍스트는 오른쪽 카드에서 <b>직접 클릭 후 타이핑</b><br>
+        ✅ Enter 치면 자동으로 <code>&lt;br&gt;</code> 들어감<br>
+        ✅ 복사는 “결과물 카드 HTML”만 복사됨 (에디터 UI 제외)
+      </div>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="stageTop">
+      <div class="badge">실시간 미리보기</div>
+      <div class="dangerNote">카드 안의 글은 여기서 바로 수정해도 됨 ✨</div>
+    </div>
+
+    <div class="previewShell">
+      <!-- ====== EXPORT TARGET START ====== -->
+      <div id="exportRoot">
+
+        <div style="width:100%;margin-top:20px;margin-bottom:20px;border-radius:22px;overflow:hidden;background:#ffffff;box-shadow:0 18px 40px rgba(0,0,0,0.18);">
+          <div style="position: relative;">
+            <div style="position:relative;width:100%;aspect-ratio:16/9;margin-bottom:20px;overflow:hidden;">
+              <div id="facadeBg" style="position:absolute;inset:0;background:url('https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=800/charim/e75c48c5-b0ea-4849-92fc-c517ba2d528c?v=3c3a2e') center/cover no-repeat;"></div>
+              <div style="position:absolute;left:-40%;top:-46%;width:180%;height:100%;background:linear-gradient(to bottom, rgba(0, 0, 0, 0.666) 0%, rgba(0, 0, 0, 0)100%);transform:rotate(-30deg);pointer-events:none;"></div>
+              <div style="position:absolute;left:-40%;bottom:-19%;width:180%;height:20%;background:#000;transform:rotate(-30deg);pointer-events:none;"></div>
+
+              <div id="facadeTitle" contenteditable="true"
+                   style="position:absolute;bottom:17%;right:4%;color:#fbbf24;font-size:6vmax;font-weight:800;letter-spacing:0.5px;font-family:Impact, sans-serif;text-shadow:-1px 0 #ffffff,1px 0 #000,0 1px #000,0 -1px #000,0 0 6px rgba(251,191,36,0.8);">
+                FACADE
+              </div>
+              <div class="editableHint">여기부터 클릭하고 수정</div>
+            </div>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:10%;background:linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 55%, #ffffff 100%);pointer-events:none;"></div>
+          </div>
+
+          <div style="padding:22px 20px 26px 20px;box-sizing:border-box;background:#ffffff;">
+            <div id="facadeText" contenteditable="true"
+                 style="font-size:14px;line-height:1.6;color:#1f2937;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,0.25);">
+              내 오른쪽 옆구리<br>
+              한때 당신의 <span style="background:linear-gradient(to top, rgba(255,59,59,0.45) 55%, transparent 55%);padding:0 2px;">이름</span>이 머물렀던 자리에 다른 이름이 새겨졌다.<br><br>
+              당신의 이름이 옅어지고 완전히 사라지는 데 걸린 시간만큼, 내 세상도 함께 빛을 잃어갔다.<br>
+              그날, 프리마커 놈들이 모든 것을 앗아간 그 순간에 내 시간은 영원히 멈췄어야 했다.<br>
+              그런데 이제 와서... 이 낯선 <span style="background:linear-gradient(to top, rgba(255,59,59,0.45) 55%, transparent 55%);padding:0 2px;">이름</span>은 대체 뭐란 말인가.<br>
+              이건 신이 내린 저주인가, 아니면 질 나쁜 농담인가.<br><br>
+              난 그럴 자격이 없는 사람인데.<br><br>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="width:100%;margin:0 auto;box-sizing:border-box;border-radius:20px;overflow:hidden;position:relative;font-family:'Noto Sans KR',sans-serif;color:#111827;">
+            <div style="position:absolute;top:0;left:0;right:0;bottom:0;background: linear-gradient(144deg, rgba(255, 255, 255, 0.95) 0%, rgb(228, 228, 228) 100%);"></div>
+
+            <div style="position:relative;padding:20px 18px 20px 18px;box-sizing:border-box;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;align-content:center;">
+
+              <div style="flex:1 1 320px;min-width:260px;display:flex;align-items:flex-end;justify-content:center;">
+                <div style="width:100%;max-width:380px;border-radius:22px;background: linear-gradient(135deg, #f8fb12, #ff4da5, #1fe8ff);padding:6px;box-sizing:border-box;box-shadow:0 12px 28px rgba(15,23,42,0.45);position:relative;overflow:hidden;">
+                  <div id="patternGif" style="position:absolute;top:0;left:0;right:0;bottom:0;background:url('https://i.pinimg.com/originals/ac/75/a6/ac75a62b02930b0936230e995a6962b2.gif') repeat;background-size:160px;mix-blend-mode:multiply;pointer-events:none;"></div>
+
+                  <div style="border-radius:18px;background:radial-gradient(circle at top,#1f2937 0,#020617 55%,#020617 100%);padding:10px 10px 12px 10px;box-sizing:border-box;display:flex;flex-direction:column;align-items:stretch;position:relative;overflow:hidden;">
+
+                    <div style="display:flex;justify-content:flex-end;">
+                      <div id="rankText" contenteditable="true"
+                           style="padding:2px 7px;border-radius:8px;color:#fbbf24;font-size:32px;font-weight:800;letter-spacing:0.5px;text-shadow:-1px 0 #ffffff,1px 0 #000,0 1px #000,0 -1px #000,0 0 6px rgba(251,191,36,0.8); font-family: Impact, sans-serif;">
+                        S Rank
+                      </div>
+                    </div>
+
+                    <div id="profileBg" style="margin-top:10px;border-radius:14px;background:url('https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=500/charim/e0ced288-81ac-4ee3-a37b-577499e416f2?v=17652048340000') no-repeat bottom center/cover;padding:10px 6px 8px 6px;box-sizing:border-box;display:flex;justify-content:center;align-items:center;position:relative;">
+
+                      <div id="heroTag" contenteditable="true"
+                           style="position:absolute;top:8px;left:10px;padding:2px 6px;border-radius:999px;background:rgba(15,23,42,0.85);border:1px solid rgba(148,163,184,0.7);font-size:9px;color:#e5e7eb;font-weight:700;letter-spacing:0.5px;">
+                        HERO : TASER
+                      </div>
+
+                      <img id="charImg"
+                           style="display:block;width:100%;max-width:240px;height:auto;border-radius:12px;background-color:transparent !important;filter:drop-shadow(0 4px 10px rgba(15,23,42,0.45));margin-left:-40px;"
+                           alt="캐릭터 이미지"
+                           src="https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=500/charim/9f577ff3-c4e4-406b-9511-aa47e711b570?v=17653413600000">
+
+                      <div id="emoji1" style="position:absolute;top:60px;left:110%;font-size:30px;animation:tada 2s infinite;margin-left:-120px;">💦</div>
+                      <div id="emoji2" style="position:absolute;top:220px;right:80%;font-size:30px;animation:tada 2s infinite;margin-left:-120px;">🍬</div>
+                      <div id="emoji3" style="position:absolute;top:340px;left:110%;font-size:30px;animation:tada 2s infinite;margin-left:-120px;">🏠</div>
+                    </div>
+
+                    <div style="margin-top:8px;border-radius:12px;background:linear-gradient(90deg,#0f172a,#020617);padding:6px 8px 7px 8px;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -1px 0 rgba(148,163,184,0.4),0 6px 10px rgba(0,0,0,0.6);">
+                      <div>
+                        <p id="nameKr" contenteditable="true"
+                           style="margin:0;font-size:19px;font-weight:900;color:#fef3c7;text-shadow:-1px 0 #000,1px 0 #000,0 1px #000,0 -1px #000,0 0 6px rgba(251,191,36,0.8);letter-spacing:1px;">
+                          테이저
+                        </p>
+                        <p id="subtitle" contenteditable="true" style="margin:1px 0 0 0;font-size:10px;color:#9ca3af;">
+                          Taser · S급 초능력 보유 히어로
+                        </p>
+                      </div>
+
+                      <div style="display:flex;flex-direction:column;align-items:flex-end;font-size:9px;gap:3px;">
+                        <span id="roleTag" contenteditable="true" style="padding:3px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;font-weight:800;letter-spacing:0.5px;">ROLE · HERO</span>
+                        <span id="dangerTag" contenteditable="true" style="padding:3px 8px;border-radius:999px;background:#fee2e2;color:#b91c1c;font-weight:800;letter-spacing:0.5px;">DANGER · S</span>
+                      </div>
+                    </div>
+
+                    <div id="footerLine" contenteditable="true" style="margin-top:5px;text-align:right;font-size:8px;color:#9ca3af;">
+                      <span style="letter-spacing:1px;text-transform:uppercase;">AEGIS Domion Headquarters</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="flex:1 1 380px;min-width:280px;display:flex;flex-direction:column;gap:10px;">
+                <div style="border-radius:18px;background:#fdfdfd;box-shadow:0 10px 24px rgba(148,163,184,0.35);border:1px solid #e5e7eb;padding:20px 14px 14px 14px;box-sizing:border-box;position:relative;background-image:linear-gradient(to right, rgba(148,163,184,0.18) 1px, transparent 1px),linear-gradient(to bottom, rgba(148,163,184,0.16) 1px, transparent 1px);background-size:18px 18px;">
+
+                  <div style="position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:74px;height:16px;border-radius:999px;background:linear-gradient(180deg,#e5e7eb,#9ca3af);box-shadow:0 2px 4px rgba(15,23,42,0.35);border:1px solid rgba(107,114,128,0.9);"></div>
+
+                  <div style="margin-top:20px;display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;">
+                    <div>
+                      <p id="codeNameLine" contenteditable="true" style="margin:0;font-size:22px;font-weight:900;letter-spacing:1px;color:#0f172a; font-family: Impact, sans-serif;">CODE NAME : TASER</p>
+                      <p id="profileSub" contenteditable="true" style="margin:2px 0 0 0;font-size:11px;color:#6b7280;">히어로 프로필 / 기본 정보</p>
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;font-size:10px;">
+                      <span id="activeTag" contenteditable="true" style="padding:4px 10px;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:700;">ACTIVE</span>
+                    </div>
+                  </div>
+
+                  <div style="display:flex;gap:6px;margin-bottom:10px;border-radius:999px;background:#e5e7eb;padding:3px;box-sizing:border-box;font-size:11px;font-weight:700;color:#6b7280;">
+                    <span contenteditable="true" style="flex:1 1 auto;text-align:center;border-radius:999px;background:#ffffff;color:#0f172a;padding:5px 0;">기본 정보</span>
+                    <span contenteditable="true" style="flex:1 1 auto;text-align:center;border-radius:999px;padding:5px 0;opacity:0.6;">능력치</span>
+                    <span contenteditable="true" style="flex:1 1 auto;text-align:center;border-radius:999px;padding:5px 0;opacity:0.6;">스킬</span>
+                  </div>
+
+                  <div>
+                    <div id="symbolBg" style="background:url('https://cdn.caveduck.io/cdn-cgi/image/anim=true,f=auto,w=800/charim/91c0f01e-e0d9-4c82-a941-ed58b6a10ca0') center/contain no-repeat;width:100%;height:160px;margin:20px 0;mix-blend-mode:multiply;"></div>
+                  </div>
+
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">
+                    <div style="flex:1 1 80px;min-width:80px;border-radius:10px;background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;box-sizing:border-box;font-size:11px;color:#4b5563;display:flex;justify-content:space-between;align-items:center;">
+                      <span contenteditable="true">본명</span><span id="realName" contenteditable="true" style="font-weight:700;color:#1d4ed8;">마르크 뤼시에</span>
+                    </div>
+                    <div style="flex:1 1 45px;min-width:50px;border-radius:10px;background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;box-sizing:border-box;font-size:11px;color:#4b5563;display:flex;justify-content:space-between;align-items:center;">
+                      <span contenteditable="true">나이</span><span id="age" contenteditable="true" style="font-weight:700;color:#1d4ed8;">42세</span>
+                    </div>
+                    <div style="flex:1 1 50px;min-width:70px;border-radius:10px;background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;box-sizing:border-box;font-size:11px;color:#4b5563;display:flex;justify-content:space-between;align-items:center;">
+                      <span contenteditable="true">신분</span><span id="status" contenteditable="true" style="font-weight:700;color:#1d4ed8;">민간인</span>
+                    </div>
+                    <div style="flex:1 1 80px;min-width:80px;border-radius:10px;background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;box-sizing:border-box;font-size:11px;color:#4b5563;display:flex;justify-content:space-between;align-items:center;">
+                      <span contenteditable="true">등급</span><span id="grade" contenteditable="true" style="font-weight:700;color:#1d4ed8;">S → D</span>
+                    </div>
+                  </div>
+
+                  <div style="border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;padding:8px 10px;box-sizing:border-box;font-size:12px;color:#4b5563;">
+                    <p contenteditable="true" style="margin:0 0 4px 0;font-size:11px;font-weight:700;color:#6b7280;">종합 소견</p>
+                    <p id="overall" contenteditable="true" style="margin:0 0 2px 0; line-height:1.7;">
+                      도미온 내 <span style="color:#1d4ed8;font-weight:700;">유일무이의 결계 초능력자.</span> 전성기에는 ‘완전 봉인 결계’로 전장을 단독 봉쇄하며 최고의 결계 히어로로 불렸다.<br>
+                      그러나 30대 초중반 무렵 프리마커의 대규모 테러로 메이트였던 <span style="color:#1d4ed8;font-weight:700;">아내를 잃은 이후</span>, 죄책감과 트라우마가 능력을 붕괴시켰다.<br>
+                      현재 결계 발동 시 사망한 아내의 환각과 극심한 이명이 동반되며, 범위·강도·지속 시간이 급감해 1분 내외로 유지되는 수준으로 떨어져 <span style="color:#1d4ed8;font-weight:700;">D급 판정</span>을 받았다.<br>
+                      은퇴 후 민간인으로 살아가지만, 에이저스 시절 훈련으로 근력·체력·지구력 등 신체 능력은 일반인을 상회한다.
+                    </p>
+                  </div>
+
+                  <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;">
+                    <div style="flex:1 1 150px;min-width:150px;border-radius:12px;background:#ffffff;border:1px solid #e5e7eb;padding:8px 10px;box-sizing:border-box;font-size:12px;color:#4b5563;">
+                      <p contenteditable="true" style="margin:0 0 4px 0;font-size:11px;font-weight:700;color:#6b7280;">외모</p>
+                      <p id="appearance" contenteditable="true" style="margin:0 0 2px 0; line-height:1.7;">
+                        키 194cm, 듬직한 체구<br>
+                        햇빛이 비치면 석양빛이 감도는 부드러운 갈색 머리, 녹안. 어딘가 피로해 보이는 인상.<br>
+                        검정·갈색·카키 계열의 옷을 즐겨 입는다.<br>
+                        활동성 좋은 착장을 선호한다.<br>
+                      </p>
+                    </div>
+
+                    <div style="flex:1 1 150px;min-width:150px;border-radius:12px;background:#ffffff;border:1px solid #e5e7eb;padding:8px 10px;box-sizing:border-box;font-size:12px;color:#4b5563;">
+                      <p contenteditable="true" style="margin:0 0 4px 0;font-size:11px;font-weight:700;color:#6b7280;">초능력</p>
+                      <p id="ability" contenteditable="true" style="margin:0 0 2px 0; line-height:1.7;">
+                        <span style="color:#1d4ed8;font-weight:700;">Sceau Parfait(쏘 파르페) · 결계 계열</span><br>
+                        외부 세계와 완전히 단절된 공간을 형성하는 ‘완전 봉인 결계’.<br>
+                        결계에 갇힌 대상은 출입 불가능, 능력 사용 제한, 시간 체감 왜곡을 겪으며, 결계 유지 중에는 내부 상태가 전면 통제된다.<br>
+                        • 공간 단위 봉쇄: 반경 수십 미터 완전 차단<br>
+                        • 능력 간섭 차단: 결계 내부 능력 비활성화 (예외: 본인)<br>
+                        • 시간 감속: 체감 시간 저하를 의지로 설정 가능<br>
+                        • 패널티: 사용 후 체력·정신력 극소모<br>
+                        • 조건: 고도의 집중력 필요, 감정이 무너지면 유지 불가<br><br>
+                        현재는 트라우마로 발동 시 환각과 이명이 동반되며, 범위·강도 감소 + 지속 시간 1분 내외로 급감해 D급 판정.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;">
+                    <div style="flex:1 1 150px;min-width:150px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;padding:8px 10px;box-sizing:border-box;font-size:12px;color:#4b5563;">
+                      <p contenteditable="true" style="margin:0 0 4px 0;font-size:11px;font-weight:700;color:#6b7280;">성격</p>
+                      <p id="personality" contenteditable="true" style="margin:0 0 2px 0; line-height:1.7;">
+                        늘 피로에 절여진듯한 태도. 까칠하다.<br>
+                        귀찮은 건 딱 질색이지만 가끔 물러질 때도 있다.<br>
+                        타인과 거리를 두려한다.
+                      </p>
+                    </div>
+
+                    <div style="flex:1 1 150px;min-width:150px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;padding:8px 10px;box-sizing:border-box;font-size:12px;color:#4b5563;">
+                      <p contenteditable="true" style="margin:0 0 4px 0;font-size:11px;font-weight:700;color:#6b7280;">특징</p>
+                      <p id="features" contenteditable="true" style="margin:0 0 2px 0; line-height:1.7;">
+                        죄책감과 슬픔을 필사적으로 숨긴다. 낮은 자존감.<br>
+                        <span style="color:#1d4ed8;font-weight:700;">네임 위치는 오른쪽 옆구리</span><br>
+                        <span style="color:#1d4ed8;font-weight:700;">히트폴 억제제 복용</span><br>
+                        아무데서나 잘 잔다.<br><br>
+                        싫어하는 것: 단 것, 허울뿐인 위로, 귀찮은 것<br>
+                        좋아하는 것: 밤거리 산책, 에스프레소
+                      </p>
+                    </div>
+
+                    <div style="flex:1 1 150px;min-width:150px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;padding:8px 10px;box-sizing:border-box;font-size:12px;color:#4b5563;">
+                      <p contenteditable="true" style="margin:0 0 4px 0;font-size:11px;font-weight:700;color:#6b7280;">기타</p>
+                      <p id="etc" contenteditable="true" style="margin:0 0 2px 0; line-height:1.7;">
+                        30대 중반 프리마커의 대규모 테러로 아내(메이트)를 잃음. 이후 에이저스를 나와 은퇴.<br>
+                        전처의 사망 후 몸에 각인된 전처의 이름은 회색으로 바래 사라졌지만, 최근에는 {{user}}의 이름이 새겨진 상태.<br><br>
+                        중심지에서 조금 벗어난 한적한 마을의 빌라에서 산다. 생활감 거의 없으며 냉장고에 생수와 술만 있다.
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- ====== EXPORT TARGET END ====== -->
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast">복사 완료! 💗</div>
+
+<script>
+  const $ = (sel) => document.querySelector(sel);
+
+  const defaults = {
+    facadeBg: "https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=800/charim/e75c48c5-b0ea-4849-92fc-c517ba2d528c?v=3c3a2e",
+    facadeTitle: "FACADE",
+    patternGif: "https://i.pinimg.com/originals/ac/75/a6/ac75a62b02930b0936230e995a6962b2.gif",
+    profileBg: "https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=500/charim/e0ced288-81ac-4ee3-a37b-577499e416f2?v=17652048340000",
+    charImg: "https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=500/charim/9f577ff3-c4e4-406b-9511-aa47e711b570?v=17653413600000",
+    symbolBg: "https://cdn.caveduck.io/cdn-cgi/image/anim=true,f=auto,w=800/charim/91c0f01e-e0d9-4c82-a941-ed58b6a10ca0",
+    emoji1: "💦",
+    emoji2: "🍬",
+    emoji3: "🏠"
+  };
+
+  function setBg(el, url){
+    if(!url) return;
+    el.style.background = `url('${url}') center/cover no-repeat`;
+  }
+  function setBgContain(el, url){
+    if(!url) return;
+    el.style.background = `url('${url}') center/contain no-repeat`;
+  }
+
+  function applyInputs(){
+    const facadeUrl = $("#inFacadeBg").value.trim();
+    const facadeTitle = $("#inFacadeTitle").value;
+    const patternGif = $("#inPatternGif").value.trim();
+    const profileUrl = $("#inProfileBg").value.trim();
+    const charUrl = $("#inCharImg").value.trim();
+    const symbolUrl = $("#inSymbolBg").value.trim();
+    const e1 = $("#inEmoji1").value;
+    const e2 = $("#inEmoji2").value;
+    const e3 = $("#inEmoji3").value;
+
+    if (facadeUrl) setBg($("#facadeBg"), facadeUrl);
+    if (patternGif) $("#patternGif").style.backgroundImage = `url('${patternGif}')`;
+    if (profileUrl) setBg($("#profileBg"), profileUrl);
+    if (charUrl) $("#charImg").src = charUrl;
+    if (symbolUrl) setBgContain($("#symbolBg"), symbolUrl);
+
+    if (facadeTitle !== "") $("#facadeTitle").textContent = facadeTitle;
+
+    if (e1 !== "") $("#emoji1").textContent = e1;
+    if (e2 !== "") $("#emoji2").textContent = e2;
+    if (e3 !== "") $("#emoji3").textContent = e3;
+  }
+
+  function bindLive(){
+    ["#inFacadeBg","#inFacadeTitle","#inPatternGif","#inProfileBg","#inCharImg","#inSymbolBg","#inEmoji1","#inEmoji2","#inEmoji3"]
+      .forEach(id => $(id).addEventListener("input", applyInputs));
+  }
+
+  function showToast(msg){
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("on");
+    setTimeout(() => t.classList.remove("on"), 900);
+  }
+
+  function normalizeEditable(root){
+    // contenteditable에서 붙여넣기 시 스타일 폭주 방지: "가능하면 텍스트만"으로
+    root.querySelectorAll('[contenteditable="true"]').forEach(el => {
+      el.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+        insertTextAtCursor(text);
+      });
+
+      // Enter => <br>
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          insertBrAtCursor();
+        }
+      });
+    });
+  }
+
+  function insertBrAtCursor(){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    const br = document.createElement("br");
+    range.deleteContents();
+    range.insertNode(br);
+
+    // 커서 다음 위치로
+    range.setStartAfter(br);
+    range.setEndAfter(br);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function insertTextAtCursor(text){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.setEndAfter(node);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function getExportHTML(){
+    // exportRoot만 뽑아서, contenteditable 속성 제거
+    const root = $("#exportRoot").cloneNode(true);
+    root.querySelectorAll("[contenteditable]").forEach(el => el.removeAttribute("contenteditable"));
+    // 편집 힌트 제거
+    root.querySelectorAll(".editableHint").forEach(el => el.remove());
+    return root.innerHTML.trim();
+  }
+
+  async function copyExport(){
+    const html = getExportHTML();
+    try{
+      await navigator.clipboard.writeText(html);
+      showToast("복사 완료! 💗");
+    } catch (err){
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = html;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("복사 완료! 💗");
+    }
+  }
+
+  function resetAll(){
+    $("#inFacadeBg").value = defaults.facadeBg;
+    $("#inFacadeTitle").value = defaults.facadeTitle;
+    $("#inPatternGif").value = defaults.patternGif;
+    $("#inProfileBg").value = defaults.profileBg;
+    $("#inCharImg").value = defaults.charImg;
+    $("#inSymbolBg").value = defaults.symbolBg;
+    $("#inEmoji1").value = defaults.emoji1;
+    $("#inEmoji2").value = defaults.emoji2;
+    $("#inEmoji3").value = defaults.emoji3;
+    applyInputs();
+    showToast("리셋했어 ✨");
+  }
+
+  // init
+  bindLive();
+  normalizeEditable($("#exportRoot"));
+
+  $("#btnCopy").addEventListener("click", copyExport);
+  $("#btnReset").addEventListener("click", resetAll);
+
+  resetAll();
+</script>
+</body>
+</html>
