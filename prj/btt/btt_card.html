@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Be the TOP 참가자 프로필 카드</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f8;font-family:'Pretendard','Noto Sans KR',sans-serif;color:#111}
+.wrap{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:32px}
+.editor{width:min(1120px,100%);display:grid;grid-template-columns:380px minmax(0,1fr);gap:24px;align-items:start}
+.panel{background:#fff;border:1px solid #e7ebf0;border-radius:24px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
+.form-panel{padding:24px}
+.form-title{margin:0 0 8px;font-size:32px;font-weight:900;letter-spacing:-.03em}
+.form-sub{margin:0 0 24px;font-size:14px;line-height:1.6;color:#667085}
+.group{margin-bottom:16px}
+.label{display:block;margin-bottom:8px;font-size:13px;font-weight:800;color:#344054}
+.input,.textarea,.file{width:100%;border:1px solid #d9e0e7;border-radius:14px;background:#fff;padding:14px 15px;font:inherit;outline:none;transition:.2s}
+.input:focus,.textarea:focus,.file:focus{border-color:#ff4d4f;box-shadow:0 0 0 4px rgba(255,77,79,.10)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.textarea{resize:none;min-height:100px;line-height:1.6}
+.helper{margin-top:6px;font-size:12px;color:#98a2b3}
+.radio-wrap{display:flex;gap:14px;flex-wrap:wrap;padding:12px 14px;border:1px solid #d9e0e7;border-radius:14px}
+.radio-wrap label{display:flex;align-items:center;gap:6px;font-size:14px;color:#475467}
+.preview-panel{padding:28px;display:flex;justify-content:center;align-items:center;min-height:640px;background:linear-gradient(180deg,#ffffff 0%,#fafbfc 100%)}
+.card{width:540px;height:341px;flex:0 0 540px;position:relative;border-radius:22px;overflow:hidden;background:#fff;border:1px solid #e5e7eb;box-shadow:0 20px 40px rgba(17,24,39,.10)}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,77,79,.10) 0%,rgba(255,77,79,0) 34%,rgba(17,24,39,.02) 100%);pointer-events:none;z-index:0}
+.card::after{content:'';position:absolute;right:-52px;top:-52px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,77,79,.14) 0%,rgba(255,77,79,0) 72%);pointer-events:none;z-index:0}
+.logo-watermark{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;pointer-events:none;z-index:0}
+.logo-watermark img{width:60%;max-width:280px;height:auto;display:block;opacity:.07;filter:grayscale(1)}
+.brand{position:absolute;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;z-index:3}
+.brand-left{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-logo{height:32px;width:auto;display:block;object-fit:contain}
+.brand-text{font-size:11px;font-weight:900;letter-spacing:.16em;color:#ff4d4f;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-badge{flex:0 0 auto;padding:7px 10px;border-radius:999px;background:#fff1f1;color:#ff4d4f;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;border:1px solid #ffd4d5}
+.main{position:absolute;inset:54px 18px 18px;display:flex;flex-direction:column;gap:10px;z-index:2}
+.top-row{display:flex;gap:22px}
+.photo{position:relative;border-radius:8px;overflow:hidden;background:#eef1f5;border:1px solid #e6eaf0;width:190px;aspect-ratio:3/4;flex:0 0 auto}
+.photo img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.photo-empty{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;color:#98a2b3;text-align:center;padding:12px}
+.photo-empty strong{font-size:12px;color:#667085}
+.info{flex:1;display:flex;flex-direction:column;justify-content:flex-start;gap:10px;padding-top:6px;min-width:0;margin-top:8px;}
+.name{font-size:32px;font-weight:900;letter-spacing:-.04em;line-height:1;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.name-meta{display:flex;align-items:flex-end;gap:8px;min-width:0}
+.inline-meta{font-size:13px;color:#666;margin-bottom:3px;white-space:nowrap}
+.section-title{font-size:11px;font-weight:900;letter-spacing:.14em;color:#98a2b3;text-transform:uppercase;margin:0 0 8px;margin-top: 20px;}
+.skill{font-size:16px;font-weight:800;color:#111827;line-height:1.4;min-height:22px;word-break:keep-all}
+.bottom{padding-top:8px}
+.quote{font-size:16px;font-weight:800;color:#111827;line-height:1.4;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.save-wrap{position:fixed;bottom:20px;right:20px;z-index:999}
+.save-btn{padding:14px 20px;border:none;border-radius:14px;background:#111827;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 10px 20px rgba(0,0,0,.2)}
+.save-btn:disabled{opacity:.55;cursor:wait}
+@media (max-width:920px){.editor{grid-template-columns:1fr}.preview-panel{min-height:auto;overflow-x:auto;justify-content:flex-start}}
+@media (max-width:560px){.wrap{padding:16px}.form-panel,.preview-panel{padding:18px}.row-3{grid-template-columns:1fr}.preview-panel{overflow-x:auto;justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="editor">
+    <div class="panel form-panel">
+      <h1 class="form-title">Be the top 참가자 카드</h1>
+      <p class="form-sub">아래 정보를 기입 후, 이미지 저장 버튼을 눌러주세요.</p>
+
+      <div class="group">
+        <label class="label" for="profileImage">프로필 이미지 첨부</label>
+        <input class="file" id="profileImage" type="file" accept="image/*" />
+      </div>
+
+      <div class="group">
+        <label class="label" for="nameInput">이름</label>
+        <input class="input" id="nameInput" type="text" value="김도윤" maxlength="12" />
+      </div>
+
+      <div class="row">
+        <div class="group">
+          <label class="label" for="genderInput">성별</label>
+          <select class="input" id="genderInput"><option value="남" selected>남</option><option value="여">여</option></select>
+        </div>
+        <div class="group">
+          <label class="label" for="ageInput">나이</label>
+          <input class="input" id="ageInput" type="text" value="22" maxlength="6" />
+        </div>
+      </div>
+
+      <div class="group">
+        <label class="label">봇주 나이 구분</label>
+        <div class="radio-wrap">
+          <label><input type="radio" name="ownerAge" value="adult" checked /> 성인</label>
+          <label><input type="radio" name="ownerAge" value="minor" /> 미성년자</label>
+        </div>
+      </div>
+
+      <div class="group">
+        <label class="label" for="skillInput">특기</label>
+        <input class="input" id="skillInput" type="text" value="보컬" maxlength="36" />
+      </div>
+
+      <div class="group">
+        <label class="label" for="quoteInput">한마디</label>
+        <textarea class="textarea" id="quoteInput" maxlength="90">열심히 하겠습니다.</textarea>
+      </div>
+    </div>
+
+    <div class="panel preview-panel">
+      <div class="card" id="cardEl">
+        <div class="logo-watermark">
+          <img id="watermarkLogo" alt="" />
+        </div>
+
+        <div class="brand">
+          <div class="brand-left">
+            <img id="brandLogo" class="brand-logo" alt="Be the TOP 로고" />
+            <span class="brand-text">Participant Card</span>
+          </div>
+          <div class="mini-badge" id="ageBadge">20↑</div>
+        </div>
+
+        <div class="main">
+          <div class="top-row">
+            <div class="photo" id="photoBox">
+              <img id="photoPreview" alt="프로필 이미지" style="display:none;" />
+              <div class="photo-empty" id="photoEmpty">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm0 2c-3.314 0-6 2.015-6 4.5 0 .276.224.5.5.5h11c.276 0 .5-.224.5-.5 0-2.485-2.686-4.5-6-4.5Z" fill="#98A2B3"/></svg>
+                <strong>이미지 업로드</strong>
+              </div>
+            </div>
+
+            <div class="info">
+              <div class="name-meta">
+                <div class="name" id="namePreview">김도윤</div>
+                <div class="inline-meta">
+                  <span id="genderPreview">남</span>
+                  <span> · </span>
+                  <span id="agePreview">22</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="section-title">Specialty</div>
+                <div class="skill" id="skillPreview">파워 보컬 · 고음 애드리브</div>
+              </div>
+              <div>
+                <div class="section-title">Message</div>
+            <div class="quote" id="quotePreview">무대 위에서 가장 먼저 기억되는 참가자가 되겠습니다.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="save-wrap">
+  <button id="downloadBtn" class="save-btn">이미지 저장</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+const LOGO_URL='https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=800/charim-standard/30c8e379-21a6-4730-8102-c75beb9fd33c?v=bc2f3e';
+
+const nameInput=document.getElementById('nameInput');
+const genderInput=document.getElementById('genderInput');
+const ageInput=document.getElementById('ageInput');
+const skillInput=document.getElementById('skillInput');
+const quoteInput=document.getElementById('quoteInput');
+const profileImage=document.getElementById('profileImage');
+
+const namePreview=document.getElementById('namePreview');
+const genderPreview=document.getElementById('genderPreview');
+const agePreview=document.getElementById('agePreview');
+const skillPreview=document.getElementById('skillPreview');
+const quotePreview=document.getElementById('quotePreview');
+const photoPreview=document.getElementById('photoPreview');
+const photoEmpty=document.getElementById('photoEmpty');
+const ageBadge=document.getElementById('ageBadge');
+const ownerRadios=document.querySelectorAll('input[name="ownerAge"]');
+const downloadBtn=document.getElementById('downloadBtn');
+const cardEl=document.getElementById('cardEl');
+const brandLogo=document.getElementById('brandLogo');
+const watermarkLogo=document.getElementById('watermarkLogo');
+
+function bindText(input,preview,fallback){
+  const render=()=>{
+    const value=input.value.trim();
+    preview.textContent=value||fallback;
+  };
+  input.addEventListener('input',render);
+  render();
+}
+
+bindText(nameInput,namePreview,'이름');
+bindText(genderInput,genderPreview,'남');
+bindText(ageInput,agePreview,'-');
+bindText(skillInput,skillPreview,'특기를 입력해줘');
+bindText(quoteInput,quotePreview,'한마디를 입력해줘');
+
+ownerRadios.forEach(radio=>{
+  radio.addEventListener('change',()=>{
+    ageBadge.textContent=radio.value==='adult'?'20↑':'20↓';
+  });
+});
+
+profileImage.addEventListener('change',event=>{
+  const file=event.target.files&&event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    photoPreview.src=e.target.result;
+    photoPreview.style.display='block';
+    photoEmpty.style.display='none';
+  };
+  reader.readAsDataURL(file);
+});
+
+async function toDataURL(url){
+  const res=await fetch(url,{mode:'cors'});
+  if(!res.ok) throw new Error('logo fetch failed');
+  const blob=await res.blob();
+  return await new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onloadend=()=>resolve(reader.result);
+    reader.onerror=reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function setupLogos(){
+  try{
+    const dataUrl=await toDataURL(LOGO_URL);
+    brandLogo.src=dataUrl;
+    watermarkLogo.src=dataUrl;
+  }catch(error){
+    brandLogo.crossOrigin='anonymous';
+    watermarkLogo.crossOrigin='anonymous';
+    brandLogo.referrerPolicy='no-referrer';
+    watermarkLogo.referrerPolicy='no-referrer';
+    brandLogo.src=LOGO_URL;
+    watermarkLogo.src=LOGO_URL;
+  }
+}
+
+async function waitForImages(container){
+  const images=Array.from(container.querySelectorAll('img')).filter(img=>img.src);
+  await Promise.all(images.map(img=>{
+    if(img.complete&&img.naturalWidth>0) return Promise.resolve();
+    return new Promise(resolve=>{
+      img.onload=()=>resolve();
+      img.onerror=()=>resolve();
+    });
+  }));
+}
+
+setupLogos();
+
+downloadBtn.addEventListener('click',async()=>{
+  downloadBtn.disabled=true;
+  downloadBtn.textContent='저장 중...';
+  try{
+    await waitForImages(cardEl);
+    const canvas=await html2canvas(cardEl,{backgroundColor:'#ffffff',scale:2,useCORS:true,allowTaint:false,imageTimeout:15000,logging:false});
+    const link=document.createElement('a');
+    link.download='be_the_top_card.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  }catch(error){
+    alert('이미지 저장에 실패했어. 잠시 후 다시 시도해줘.');
+  }finally{
+    downloadBtn.disabled=false;
+    downloadBtn.textContent='이미지 저장';
+  }
+});
+</script>
+</body>
+</html>
