@@ -83,7 +83,7 @@ width:760px; background:#0d1229; font-family:'Noto Sans KR',sans-serif; color:#e
 .card-top-left .label-box span { font-size:8px; letter-spacing:0.35em; color:rgba(255,200,215,0.9); font-weight:700; }
 .card-top-left .title { font-size:20px; font-weight:900; color:#1a1e3a; letter-spacing:0.08em; }
 
-.card-body { display:flex; gap:20px; align-items:center; flex-wrap:nowrap; }
+.card-body { display:flex; gap:30px; align-items:center; flex-wrap:nowrap; }
 /* 카드는 항상 가로 고정 — 반응형 세로 전환 없음 */
 
 .id-card-col { flex-shrink:0; width:34%; max-width:190px; position:relative; transform:rotate(-5deg)}
@@ -99,16 +99,16 @@ width:760px; background:#0d1229; font-family:'Noto Sans KR',sans-serif; color:#e
 .card-inner::after {
   content: "Be the top";
   position: absolute;
-  bottom: 22px;
-  left: 10px;
+  bottom: 48px;
+  right: 3px;
 
   font-family: 'Dancing Script', cursive;
   font-size: 100px;
 
-  color: rgba(0,0,0,0.1); /* 핵심: 거의 배경처럼 */
+  color: rgba(0,0,0,0.03); /* 핵심: 거의 배경처럼 */
   letter-spacing: 1px;
-
-  transform: rotate(8deg);
+    font-weight: 900;
+  transform: rotate(-20deg);
 
   pointer-events: none;
 }
