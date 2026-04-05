@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet"><title>Be the Top - 1주차 메이저 미션</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a0e1f; color:#e8e6f0; font-family:'Noto Sans KR',sans-serif; min-height:100vh; }
+
+.page-header { text-align:center; padding:40px 20px 10px; }
+.page-header .tag { display:inline-block; background:#1a1e3a; padding:5px 16px; margin-bottom:8px; }
+.page-header .tag span { font-size:10px; letter-spacing:0.35em; color:rgba(255,200,215,0.9); font-weight:700; }
+.page-header h1 { font-size:28px; font-weight:900; letter-spacing:0.08em; color:#ffd4e0; }
+.page-header p { font-size:12px; color:rgba(255,200,215,0.4); letter-spacing:0.1em; margin-top:6px; }
+
+.container { max-width:960px; margin:0 auto; padding:20px; }
+
+.form-section { background:rgba(255,255,255,0.04); border:1px solid rgba(255,200,215,0.1); padding:24px; margin-bottom:30px; }
+.form-section h2 { font-size:13px; font-weight:800; letter-spacing:0.15em; color:#ffd4e0; margin-bottom:16px; border-bottom:1px solid rgba(255,200,215,0.15); padding-bottom:8px; }
+
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:560px) { .form-grid { grid-template-columns:1fr; } }
+
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group.full { grid-column:1/-1; }
+.form-group label { font-size:10px; font-weight:700; letter-spacing:0.1em; color:rgba(255,200,215,0.6); }
+.form-group input, .form-group textarea {
+  background:rgba(26,30,58,0.6); border:1px solid rgba(255,200,215,0.15); color:#e8e6f0;
+  padding:8px 10px; font-size:13px; font-family:'Noto Sans KR',sans-serif; outline:none; transition:border 0.2s;
+}
+.form-group input:focus, .form-group textarea:focus { border-color:rgba(255,200,215,0.4); }
+.form-group textarea { resize:vertical; min-height:50px; }
+
+.photo-upload { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.photo-upload .preview-box {
+  width:80px; height:106px; background:rgba(26,30,58,0.6); border:1px dashed rgba(255,200,215,0.25);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; cursor:pointer; position:relative;
+}
+.photo-upload .preview-box img { width:100%; height:100%; object-fit:cover; }
+.photo-upload .preview-box span { font-size:9px; color:rgba(255,200,215,0.3); letter-spacing:0.1em; text-align:center; padding:4px; }
+.photo-upload input[type="file"] { display:none; }
+.photo-upload .upload-info { font-size:11px; color:rgba(255,200,215,0.4); line-height:1.6; }
+
+.btn-row { display:flex; gap:12px; justify-content:center; margin:24px 0 30px; flex-wrap:wrap; }
+.btn {
+  background:#1a1e3a; color:#ffd4e0; border:2px solid rgba(255,200,215,0.3); padding:10px 28px;
+  font-size:13px; font-weight:700; letter-spacing:0.1em; cursor:pointer; font-family:'Noto Sans KR',sans-serif; transition:all 0.2s;
+}
+.btn:hover { background:#2a2f55; border-color:rgba(205, 200, 255, 0.5); }
+.btn.primary { background:#c76b82; border-color:#c76b82; color:#fff; }
+.btn.primary:hover { background:#d4798f; }
+
+.preview-section { margin-bottom:40px; }
+.preview-section h2 { font-size:13px; font-weight:800; letter-spacing:0.15em; color:#ffd4e0; margin-bottom:16px; text-align:center; }
+
+.card-wrapper { overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px; }
+
+/* === PROFILE CARD === */
+.profile-card {
+width:760px; background:#0d1229; font-family:'Noto Sans KR',sans-serif; color:#e8e6f0; padding:16px; flex-shrink:0;box-shadow:
+    0 20px 40px rgba(0,0,0,0.4),
+    inset 0 0 40px rgba(0,0,0,0.05);
+}
+.card-inner {
+  background:#f5f2ed;
+  color:#1a1e3a; position:relative; overflow:hidden; padding:24px 42px 20px; 
+}
+.card-inner::before {
+  content:''; position:absolute; top:0; left:0; width:100%; height:100%;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 24px,rgba(26,30,58,0.03) 24px,rgba(26,30,58,0.03) 25px);
+  pointer-events:none; z-index:0;
+}
+.card-content { position:relative; z-index:1; }
+
+.card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.card-top-left { display:flex; align-items:center; gap:10px; }
+.card-top-left .label-box { background:#1a1e3a; padding:4px 12px; }
+.card-top-left .label-box span { font-size:8px; letter-spacing:0.35em; color:rgba(255,200,215,0.9); font-weight:700; }
+.card-top-left .title { font-size:20px; font-weight:900; color:#1a1e3a; letter-spacing:0.08em; }
+
+.card-body { display:flex; gap:20px; align-items:center; flex-wrap:nowrap; }
+/* 카드는 항상 가로 고정 — 반응형 세로 전환 없음 */
+
+.id-card-col { flex-shrink:0; width:34%; max-width:190px; position:relative; transform:rotate(-5deg)}
+.id-card {
+  background:linear-gradient(160deg, #f8f8f8 0%, #eaeaea 100%);
+  padding:12px 10px 14px;
+  position:relative;
+  box-shadow:12px 12px 14px rgba(0,0,0,0.23);
+  font-family: 'Nanum Myeongjo', serif;
+    overflow: hidden;
+  
+}
+.card-inner::after {
+  content: "Be the top";
+  position: absolute;
+  bottom: 22px;
+  left: 10px;
+
+  font-family: 'Dancing Script', cursive;
+  font-size: 100px;
+
+  color: rgba(0,0,0,0.1); /* 핵심: 거의 배경처럼 */
+  letter-spacing: 1px;
+
+  transform: rotate(8deg);
+
+  pointer-events: none;
+}
+.id-card .tape {
+  background:rgba(255,180,200,0.6);
+  filter:blur(0.3px);
+  opacity:0.85;
+}.id-card .photo-area {
+  width:100%; aspect-ratio:3/4; background:linear-gradient(135deg,#2e3460,#3a4070);
+  border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center;
+  overflow:hidden; margin-bottom:10px;
+}
+
+.id-card .photo-area img { width:100%; height:100%; object-fit:cover; }
+.id-card .photo-area span { font-size:9px; letter-spacing:0.15em; color:rgba(255,200,215,0.3); font-weight:600; }
+.id-card .name-area { text-align:center; }
+.id-card .name-area .sub { font-size:7px; letter-spacing:0.4em; color: rgba(38, 46, 74, 0.48);margin-bottom:3px; }
+.id-card .name-area .name { font-size:16px; font-weight:900;  color: #2a314d; letter-spacing:0.12em; margin-bottom:2px; }
+.id-card .name-area .line { width:30px; height:1.5px; background: rgba(42, 49, 77, 0.22); margin:0 auto; }
+.id-card-col .profile-sticker {
+  position:absolute; bottom:8px; right:-6px; transform:rotate(12deg);
+  background:#ffc8d7; padding:3px 10px; box-shadow:1px 2px 4px rgba(0,0,0,0.15);
+}
+.id-card-col .profile-sticker span { font-size:8px; font-weight:800; color:#1a1e3a; letter-spacing:0.1em; }
+
+.info-col { flex:1; display:flex; flex-direction:column; gap:11px; }
+
+.field-row { display:flex; flex-wrap:wrap; gap:8px; }
+.field-item { flex:1; min-width:28%; display:flex; align-items:baseline; gap:6px; }
+.field-item.half { min-width:45%; }
+.field-label {
+  font-size:8px; font-weight:800; color:#1a1e3a; letter-spacing:0.08em; flex-shrink:0;
+  background:rgba(26,30,58,0.08); padding:2px 6px; white-space:nowrap;
+}
+.field-value {
+  flex:1; border-bottom:1.5px solid rgba(26,30,58,0.15); min-height:20px;
+  font-size:11px; font-weight:600; color:#1a1e3a; padding-bottom:2px; word-break:break-word;
+}
+
+.song-box {
+  position:relative; background:rgba(26,30,58,0.04); padding:10px 12px; border-left:3px solid #1a1e3a;
+}
+.song-box .tape-sm { position:absolute; top:-5px; right:10px; width:36px; height:10px; background:rgba(255,180,200,0.5); transform:rotate(3deg); }
+.song-box .box-title { font-size:8px; font-weight:800; letter-spacing:0.15em; color:#c76b82; margin-bottom:6px; }
+.song-box .box-content {
+  font-size:11px; color:#1a1e3a; font-weight:500; line-height:1.6;
+  border-bottom:1px solid rgba(26,30,58,0.1); min-height:18px; padding-bottom:2px;
+}
+
+.like-dislike { display:flex; gap:10px; }
+.like-dislike .box { flex:1; position:relative; }
+.like-dislike .box-inner { background:rgba(255,255,255,0.5); padding:10px 12px; box-shadow:2px 2px 8px rgba(0,0,0,0.05); }
+.like-dislike .tape-l { position:absolute; top:-5px; left:8px; width:30px; height:10px; background:rgba(26,30,58,0.55); transform:rotate(-2deg); z-index:1; }
+.like-dislike .tape-r { position:absolute; top:-5px; right:8px; width:30px; height:10px; background:rgba(255,180,200,0.5); transform:rotate(2deg); z-index:1; }
+.like-dislike .box-title { font-size:8px; font-weight:800; letter-spacing:0.1em; margin-bottom:6px; }
+.like-dislike .box-title.like { color:#c76b82; }
+.like-dislike .box-title.dislike { color:#1a1e3a; }
+.like-dislike .box-content {
+  font-size:10px; color:#1a1e3a; font-weight:500; line-height:1.7;
+  border-bottom:1px solid rgba(26,30,58,0.08); min-height:16px; padding-bottom:2px;
+}
+
+.animal-row { display:flex; align-items:center; gap:8px; }
+.animal-badge {
+  background:#1a1e3a; padding:4px 10px; transform:rotate(-1deg); box-shadow:2px 2px 6px rgba(0,0,0,0.15);
+}
+.animal-badge span { font-size:8px; font-weight:700; color:#ffd4e0; letter-spacing:0.1em; }
+.animal-value { flex:1; border-bottom:1.5px solid rgba(26,30,58,0.15); min-height:18px; font-size:11px; font-weight:600; color:#1a1e3a; padding-bottom:2px; }
+
+.card-footer { text-align:center; margin-top:14px; }
+.card-footer span { font-size:7px; letter-spacing:0.3em; color:rgba(26,30,58,0.2); font-weight:600; }
+
+.loading-overlay {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,14,31,0.85);
+  z-index:9999; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+}
+.loading-overlay.show { display:flex; }
+.loading-overlay p { font-size:14px; color:#ffd4e0; font-weight:700; letter-spacing:0.1em; }
+.spinner { width:36px; height:36px; border:3px solid rgba(255,200,215,0.2); border-top-color:#ffd4e0; border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+<div class="tag"><span>SURVIVAL AUDITION</span></div>
+<h1>Be the top</h1>
+<p>CONTESTANT PROFILE CARD GENERATOR</p>
+</div>
+
+<div class="container">
+
+<div class="form-section">
+<h2>PHOTO</h2>
+<div class="photo-upload">
+<div class="preview-box" id="photoPreviewBox" onclick="document.getElementById('photoInput').click()">
+<span>CLICK<br>TO<br>UPLOAD</span>
+</div>
+<input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(this)">
+<div class="upload-info">3:4 비율 권장<br>클릭해서 사진을 업로드하세요</div>
+</div>
+</div>
+
+<div class="form-section">
+<h2>BASIC INFO</h2>
+<div class="form-grid">
+<div class="form-group"><label>이름</label><input type="text" id="f_name" placeholder="홍길동" oninput="updateCard()"></div>
+<div class="form-group"><label>X 아이디</label><input type="text" id="f_twitter" placeholder="@username" oninput="updateCard()"></div>
+<div class="form-group"><label>나이</label><input type="text" id="f_age" placeholder="22" oninput="updateCard()"></div>
+<div class="form-group"><label>성별</label><input type="text" id="f_gender" placeholder="남" oninput="updateCard()"></div>
+<div class="form-group"><label>키</label><input type="text" id="f_height" placeholder="178cm" oninput="updateCard()"></div>
+<div class="form-group"><label>몸무게</label><input type="text" id="f_weight" placeholder="65kg" oninput="updateCard()"></div>
+<div class="form-group"><label>생일</label><input type="text" id="f_birthday" placeholder="2004.03.15" oninput="updateCard()"></div>
+<div class="form-group"><label>포지션</label><input type="text" id="f_position" placeholder="랩, 보컬, 댄스 등" oninput="updateCard()"></div>
+<div class="form-group"><label>고향</label><input type="text" id="f_hometown" placeholder="서울" oninput="updateCard()"></div>
+<div class="form-group"><label>MBTI</label><input type="text" id="f_mbti" placeholder="ENFP" oninput="updateCard()"></div>
+</div>
+</div>
+
+<div class="form-section">
+<h2>DETAILS</h2>
+<div class="form-grid">
+<div class="form-group full"><label>좋아하는 노래 및 가수</label><textarea id="f_song" placeholder="노래 제목 — 가수" oninput="updateCard()"></textarea></div>
+<div class="form-group"><label>좋아하는 것</label><textarea id="f_like" placeholder="한 줄에 하나씩" oninput="updateCard()"></textarea></div>
+<div class="form-group"><label>싫어하는 것</label><textarea id="f_dislike" placeholder="한 줄에 하나씩" oninput="updateCard()"></textarea></div>
+<div class="form-group"><label>닮은 동물</label><input type="text" id="f_animal" placeholder="고양이" oninput="updateCard()"></div>
+<div class="form-group"><label>좌우명</label><input type="text" id="f_motto" placeholder="좌우명을 입력하세요" oninput="updateCard()"></div>
+<div class="form-group full"><label>어필하고 싶은 것</label><textarea id="f_appeal" placeholder="자유롭게 작성" oninput="updateCard()"></textarea></div>
+</div>
+</div>
+
+<div class="btn-row">
+<div class="btn primary" onclick="downloadCard()">이미지로 다운로드</div>
+</div>
+
+<div class="preview-section">
+<h2>PREVIEW</h2>
+<div class="card-wrapper">
+
+<div class="profile-card" id="profileCard">
+<div class="card-inner">
+<div class="card-content">
+
+<div class="card-top">
+    <div class="card-top-left">
+        <div class="label-box"><span>SURVIVAL AUDITION</span></div>
+        <img src="https://cdn.caveduck.io/cdn-cgi/image/dpr=2,f=auto,w=800/charim-standard/30c8e379-21a6-4730-8102-c75beb9fd33c?v=bc2f3e"
+             style="height:22px;object-fit:contain;filter:brightness(0.9) contrast(1.1);">
+      </div>
+</div>
+
+<div class="card-body">
+
+<div class="id-card-col">
+<div class="id-card">
+<div class="tape"></div>
+<div class="photo-area" id="c_photo">
+<span>PHOTO</span>
+</div>
+<div class="name-area">
+<div class="sub">CONTESTANT</div>
+<div class="name" id="c_name">___</div>
+<div style="font-size:9px;color:#2a314d;letter-spacing:0.05em;margin-bottom:2px;" id="c_twitter">@___</div>
+<div class="line"></div>
+</div>
+</div>
+<div class="profile-sticker"><span>PROFILE</span></div>
+</div>
+
+<div class="info-col">
+
+<div class="field-row">
+<div class="field-item"><div class="field-label">이름</div><div class="field-value" id="c_name2"></div></div>
+<div class="field-item"><div class="field-label">나이</div><div class="field-value" id="c_age"></div></div>
+<div class="field-item"><div class="field-label">성별</div><div class="field-value" id="c_gender"></div></div>
+</div>
+
+<div class="field-row">
+<div class="field-item"><div class="field-label">키</div><div class="field-value" id="c_height"></div></div>
+<div class="field-item"><div class="field-label">몸무게</div><div class="field-value" id="c_weight"></div></div>
+<div class="field-item"><div class="field-label">생일</div><div class="field-value" id="c_birthday"></div></div>
+</div>
+
+<div class="field-row">
+<div class="field-item"><div class="field-label">포지션</div><div class="field-value" id="c_position"></div></div>
+<div class="field-item"><div class="field-label">고향</div><div class="field-value" id="c_hometown"></div></div>
+<div class="field-item"><div class="field-label">MBTI</div><div class="field-value" id="c_mbti"></div></div>
+</div>
+
+<div class="song-box">
+<div class="tape-sm"></div>
+<div class="box-title">♬ 좋아하는 노래 및 가수</div>
+<div class="box-content" id="c_song"></div>
+</div>
+
+<div class="like-dislike">
+<div class="box">
+<div class="tape-l"></div>
+<div class="box-inner">
+<div class="box-title like">♥ LIKE</div>
+<div class="box-content" id="c_like"></div>
+</div>
+</div>
+<div class="box">
+<div class="tape-r"></div>
+<div class="box-inner">
+<div class="box-title dislike">✕ DISLIKE</div>
+<div class="box-content" id="c_dislike"></div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;gap:12px;">
+<div class="animal-row" style="flex:1;">
+<div class="animal-badge"><span>닮은 동물</span></div>
+<div class="animal-value" id="c_animal"></div>
+</div>
+<div class="animal-row" style="flex:1;">
+<div class="animal-badge" style="transform:rotate(1deg);"><span>좌우명</span></div>
+<div class="animal-value" id="c_motto"></div>
+</div>
+</div>
+
+<div class="song-box" style="border-left-color:#c76b82;">
+<div class="tape-sm" style="background:rgba(26,30,58,0.55);left:12px;right:auto;transform:rotate(-2deg);"></div>
+<div class="box-title">★ 어필하고 싶은 것</div>
+<div class="box-content" id="c_appeal"></div>
+</div>
+
+</div>
+
+</div>
+
+<div class="card-footer">
+<span>BE THE TOP · CONTESTANT PROFILE CARD</span>
+</div>
+
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+<div class="spinner"></div>
+<p>이미지 생성 중...</p>
+</div>
+
+<script>
+function handlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const box = document.getElementById('photoPreviewBox');
+    box.innerHTML = '<img src="' + e.target.result + '" alt="photo">';
+    const area = document.getElementById('c_photo');
+    area.innerHTML = '<img src="' + e.target.result + '" alt="photo" style="width:100%;height:100%;object-fit:cover;">';
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateCard() {
+  const name = document.getElementById('f_name').value;
+  const twitter = document.getElementById('f_twitter').value;
+  const age = document.getElementById('f_age').value;
+  const gender = document.getElementById('f_gender').value;
+  const height = document.getElementById('f_height').value;
+  const weight = document.getElementById('f_weight').value;
+  const birthday = document.getElementById('f_birthday').value;
+  const position = document.getElementById('f_position').value;
+  const hometown = document.getElementById('f_hometown').value;
+  const mbti = document.getElementById('f_mbti').value;
+  const song = document.getElementById('f_song').value;
+  const like = document.getElementById('f_like').value;
+  const dislike = document.getElementById('f_dislike').value;
+  const animal = document.getElementById('f_animal').value;
+  const motto = document.getElementById('f_motto').value;
+  const appeal = document.getElementById('f_appeal').value;
+
+  document.getElementById('c_name').textContent = name || '___';
+  document.getElementById('c_twitter').textContent = twitter ? (twitter.startsWith('@') ? twitter : '@' + twitter) : '@___';
+  document.getElementById('c_name2').textContent = name;
+  document.getElementById('c_age').textContent = age;
+  document.getElementById('c_gender').textContent = gender;
+  document.getElementById('c_height').textContent = height;
+  document.getElementById('c_weight').textContent = weight;
+  document.getElementById('c_birthday').textContent = birthday;
+  document.getElementById('c_position').textContent = position;
+  document.getElementById('c_hometown').textContent = hometown;
+  document.getElementById('c_mbti').textContent = mbti;
+  document.getElementById('c_song').textContent = song;
+  document.getElementById('c_like').innerHTML = like.split('\n').filter(Boolean).join('<br>');
+  document.getElementById('c_dislike').innerHTML = dislike.split('\n').filter(Boolean).join('<br>');
+  document.getElementById('c_animal').textContent = animal;
+  document.getElementById('c_motto').textContent = motto;
+  document.getElementById('c_appeal').textContent = appeal;
+}
+
+function downloadCard() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+  const card = document.getElementById('profileCard');
+
+  html2canvas(card, {
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#0d1229'
+  }).then(function(canvas) {
+    const link = document.createElement('a');
+    const name = document.getElementById('f_name').value || 'profile';
+    link.download = 'BeTheTop_' + name + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    overlay.classList.remove('show');
+  }).catch(function() {
+    overlay.classList.remove('show');
+    alert('이미지 생성에 실패했습니다. 다시 시도해주세요.');
+  });
+}
+</script>
+
+</body>
+</html>
