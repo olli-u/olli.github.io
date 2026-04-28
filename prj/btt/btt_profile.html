@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTT universe — 네이버 프로필 생성기</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#1a2040; color:#e8e6f0; font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif; min-height:100vh; }
+
+.page-header { text-align:center; padding:40px 20px 14px; }
+.page-header .tag { display:inline-block; background:#ffc8d7; padding:5px 16px; margin-bottom:8px; }
+.page-header .tag span { font-size:10px; letter-spacing:0.35em; color:#1a2040; font-weight:800; }
+.page-header h1 { font-size:28px; font-weight:900; letter-spacing:0.05em; color:#fff; }
+.page-header p { font-size:12px; color:rgba(255,200,215,0.5); letter-spacing:0.1em; margin-top:6px; }
+
+.container { max-width:960px; margin:0 auto; padding:20px; }
+
+.form-section { background:rgba(255,255,255,0.04); border:1px solid rgba(255,200,215,0.1); padding:24px; margin-bottom:24px; }
+.form-section h2 { font-size:13px; font-weight:800; letter-spacing:0.15em; color:#ffc8d7; margin-bottom:16px; border-bottom:1px solid rgba(255,200,215,0.15); padding-bottom:8px; }
+
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:560px) { .form-grid { grid-template-columns:1fr; } }
+
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group.full { grid-column:1/-1; }
+.form-group label { font-size:10.5px; font-weight:700; letter-spacing:0.1em; color:rgba(255,200,215,0.7); }
+.form-group .hint { font-size:10px; color:rgba(255,200,215,0.4); margin-top:1px; }
+.form-group input, .form-group textarea {
+  background:rgba(26,32,64,0.6); border:1px solid rgba(255,200,215,0.15); color:#fff;
+  padding:9px 11px; font-size:13px; font-family:inherit; outline:none; transition:border 0.15s;
+}
+.form-group input:focus, .form-group textarea:focus { border-color:#ffc8d7; }
+.form-group textarea { resize:vertical; min-height:50px; }
+
+.photo-upload { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+.photo-upload .preview-box {
+  width:96px; aspect-ratio:3/4; background:linear-gradient(135deg,#ffe3ea,#fdd5e0); border:1px dashed rgba(255,200,215,0.4);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; cursor:pointer;
+}
+.photo-upload .preview-box img { width:100%; height:100%; object-fit:cover; }
+.photo-upload .preview-box span { font-size:9px; color:#1a2040; letter-spacing:0.15em; text-align:center; padding:4px; font-weight:700; opacity:0.5; }
+.photo-upload input[type="file"] { display:none; }
+.photo-upload .upload-info { font-size:11px; color:rgba(255,200,215,0.5); line-height:1.6; }
+
+.btn-row { display:flex; gap:12px; justify-content:center; margin:24px 0 30px; flex-wrap:wrap; }
+.btn {
+  background:#ffc8d7; color:#1a2040; border:none; padding:11px 30px;
+  font-size:13px; font-weight:800; letter-spacing:0.08em; cursor:pointer; font-family:inherit; transition:transform 0.15s;
+}
+.btn:hover { transform:translateY(-1px); }
+
+.preview-section { margin-bottom:40px; }
+.preview-section h2 { font-size:13px; font-weight:800; letter-spacing:0.15em; color:#ffc8d7; margin-bottom:16px; text-align:center; }
+.card-wrapper { display:flex; justify-content:center; overflow-x:auto; padding-bottom:8px; }
+
+.profile-card-bg { min-width:580px; width:580px; background:#f0f1f4; padding:14px 12px 24px; flex-shrink:0; font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif; }
+.naver-card { max-width:580px; margin:0 auto; }
+
+.search-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 4px 14px; }
+.search-bar .left { display:flex; align-items:center; gap:10px; }
+.search-bar .logo {
+  width:30px; height:30px; background:transparent url('https://cdn.caveduck.io/cdn-cgi/image/anim=true,dpr=2,f=auto,fit=crop,g=top,w=400/charim/a0266f8b-c06c-4812-8812-2f0bbd600643?v=5c6961') center/cover no-repeat;
+  border-radius:0%; flex-shrink:0;
+}
+.search-bar .title { font-size:18px; font-weight:600; color:#222; letter-spacing:-0.01em; }
+.search-bar .icons { display:flex; align-items:center; gap:14px; color:#666; }
+.search-bar .icons span:nth-child(1), .search-bar .icons span:nth-child(3) { font-size:18px; line-height:1; }
+.search-bar .icons span:nth-child(2) { font-size:8px; line-height:1; }
+
+.tab-pills { display:flex; gap:6px; padding:0 4px 14px; overflow:hidden; }
+.tab-pills .pill { padding:6px 14px; background:#fff; border:1px solid #e0e2e8; border-radius:20px; font-size:12px; color:#444; font-weight:500; flex-shrink:0; }
+.tab-pills .pill.arrow { padding:6px 10px; font-weight:600; }
+
+.profile-box { background:#fff; border:1px solid #e8eaf0; border-radius:14px; padding:22px 22px 18px; }
+
+.profile-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.profile-top .name { font-size:20px; font-weight:700; color:#222; letter-spacing:-0.01em; line-height:1.2; }
+.profile-top .occupation { font-size:13px; color:#777; margin-top:5px; }
+.profile-top .menu { font-size:16px; color:#999; line-height:1; }
+
+.subtab-pills { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+.subtab-pills .pill { padding:6px 14px; background:#fff; border:1px solid #e0e2e8; border-radius:20px; font-size:12px; color:#444; font-weight:500; }
+.subtab-pills .pill.active { background:#ffc8d7; border-color:#ffc8d7; color:#1a2040; font-weight:700; }
+
+.profile-body { display:flex; gap:20px; align-items:flex-start; }
+.profile-info { flex:1; border-left:2px solid #e8eaf0; padding-left:16px; min-width:0; }
+.info-row { display:flex; align-items:flex-start; gap:14px; padding:5px 0; }
+.info-row .label { font-size:13px; color:#777; font-weight:500; width:64px; flex-shrink:0; line-height:1.6; }
+.info-row .value { font-size:13.5px; color:#222; font-weight:500; line-height:1.6; flex:1; word-break:break-word; }
+.info-row.accent .value { color:#1a2040; font-weight:600; }
+.info-row.site .value { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+.info-row.site .x-logo { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#000; border-radius:3px; color:#fff; font-size:10px; font-weight:900; line-height:1; flex-shrink:0; }
+.info-row.site .x-id { color:#1a2040; font-weight:600; text-decoration:underline; }
+
+.profile-photo { flex-shrink:0; width:160px; aspect-ratio:3/4; background:linear-gradient(135deg,#ffe3ea,#fdd5e0); border:1px solid #f0d7e0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.profile-photo img { width:100%; height:100%; object-fit:cover; }
+.profile-photo span { font-size:10px; letter-spacing:0.2em; color:rgba(26,32,64,0.3); font-weight:700; }
+
+.profile-footer { margin-top:20px; padding-top:14px; border-top:1px solid #f0f2f7; }
+.profile-footer .meta { font-size:10px; color:#999; margin-bottom:3px; }
+.profile-footer .meta:last-of-type { margin-bottom:0; }
+.profile-footer .meta span.i { display:inline-block; width:11px; height:11px; border:1px solid #ccc; border-radius:50%; text-align:center; font-size:8px; line-height:9px; color:#999; vertical-align:-2px; }
+.profile-footer .meta u { text-decoration:underline; }
+
+.btt-tag { text-align:right; padding:10px 4px 0; }
+.btt-tag span { font-size:9.5px; color:#9ca3af; letter-spacing:0.2em; font-weight:600; }
+
+.loading-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(26,32,64,0.85); z-index:9999; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+.loading-overlay.show { display:flex; }
+.loading-overlay p { font-size:14px; color:#ffc8d7; font-weight:700; letter-spacing:0.1em; }
+.spinner { width:36px; height:36px; border:3px solid rgba(255,200,215,0.2); border-top-color:#ffc8d7; border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+<div class="tag"><span>BTT UNIVERSE</span></div>
+<h1>네이버 프로필 생성기</h1>
+<p>VOID FIELD = HIDDEN ROW</p>
+</div>
+
+<div class="container">
+
+<div class="form-section">
+<h2>PHOTO</h2>
+<div class="photo-upload">
+<div class="preview-box" id="photoPreviewBox" onclick="document.getElementById('photoInput').click()">
+<span>CLICK<br>UPLOAD</span>
+</div>
+<input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(this)">
+<div class="upload-info">3:4 비율 권장<br>클릭해서 사진 업로드</div>
+</div>
+</div>
+
+<div class="form-section">
+<h2>BASIC</h2>
+<div class="form-grid">
+<div class="form-group"><label>활동명 *</label><input type="text" id="f_stage" placeholder="활동명" oninput="updateCard()"></div>
+<div class="form-group"><label>직업</label><input type="text" id="f_job" placeholder="아이돌, 가수 / 솔로 가수 / 배우" oninput="updateCard()"></div>
+<div class="form-group"><label>본명</label><input type="text" id="f_real" placeholder="홍길동" oninput="updateCard()"></div>
+<div class="form-group"><label>출생</label><input type="text" id="f_birth" placeholder="2003.05.15. 서울특별시" oninput="updateCard()"></div>
+<div class="form-group"><label>소속그룹</label><input type="text" id="f_group" placeholder="(솔로면 비워둠)" oninput="updateCard()"></div>
+<div class="form-group"><label>소속사</label><input type="text" id="f_agency" placeholder="OO 엔터테인먼트" oninput="updateCard()"></div>
+<div class="form-group full"><label>데뷔</label><input type="text" id="f_debut" placeholder="2024.03 「First Stage」 EP" oninput="updateCard()"></div>
+<div class="form-group"><label>포지션</label><input type="text" id="f_position" placeholder="메인 보컬, 댄서" oninput="updateCard()"></div>
+<div class="form-group"><label>트위터 ID (X)</label><input type="text" id="f_twitter" placeholder="@username" oninput="updateCard()"></div>
+</div>
+</div>
+
+<div class="btn-row">
+<button class="btn" onclick="downloadCard()">이미지로 다운로드</button>
+</div>
+
+<div class="preview-section">
+<h2>PREVIEW</h2>
+<div class="card-wrapper">
+
+<div class="profile-card-bg" id="profileCard">
+<div class="naver-card">
+
+<div class="search-bar">
+<div class="left">
+<div class="logo"></div>
+<span class="title" id="c_searchTitle">활동명 프로필</span>
+</div>
+<div class="icons">
+<span>⌨</span>
+<span>▼</span>
+<span>🔍</span>
+</div>
+</div>
+
+<div class="tab-pills">
+<div class="pill">블로그</div>
+<div class="pill">카페</div>
+<div class="pill">이미지</div>
+<div class="pill">동영상</div>
+<div class="pill">뉴스</div>
+<div class="pill arrow">›</div>
+</div>
+
+<div class="profile-box">
+
+<div class="profile-top">
+<div>
+<div class="name" id="c_name">활동명</div>
+<div class="occupation" id="c_occupation" style="display:none;"></div>
+</div>
+<div class="menu">⋮</div>
+</div>
+
+<div class="subtab-pills">
+<div class="pill">전체</div>
+<div class="pill active">프로필</div>
+<div class="pill">최근활동</div>
+<div class="pill">디스코그래피</div>
+<div class="pill">스케줄</div>
+</div>
+
+<div class="profile-body">
+
+<div class="profile-info">
+
+<div class="info-row" id="r_real" style="display:none;">
+<div class="label">본명</div><div class="value" id="c_real"></div>
+</div>
+<div class="info-row" id="r_birth" style="display:none;">
+<div class="label">출생</div><div class="value" id="c_birth"></div>
+</div>
+<div class="info-row accent" id="r_group" style="display:none;">
+<div class="label">소속그룹</div><div class="value" id="c_group"></div>
+</div>
+<div class="info-row accent" id="r_agency" style="display:none;">
+<div class="label">소속사</div><div class="value" id="c_agency"></div>
+</div>
+<div class="info-row" id="r_debut" style="display:none;">
+<div class="label">데뷔</div><div class="value" id="c_debut"></div>
+</div>
+<div class="info-row" id="r_position" style="display:none;">
+<div class="label">포지션</div><div class="value" id="c_position"></div>
+</div>
+<div class="info-row site" id="r_site" style="display:none;">
+<div class="label">사이트</div>
+<div class="value">
+<span class="x-logo">𝕏</span>
+<span class="x-id" id="c_twitter">@username</span>
+</div>
+</div>
+
+</div>
+
+<div class="profile-photo" id="c_photo">
+<span>PHOTO</span>
+</div>
+
+</div>
+
+<div class="profile-footer">
+<div class="meta">BTT 측에서 직접 관리하는 정보입니다.</div>
+<div class="meta">BTT참여 2026.04.31. <span class="i">i</span></div>
+<div class="meta"><u>인물정보 본인참여</u> · <u>직업별 등재기준</u></div>
+</div>
+
+</div>
+
+<div class="btt-tag"><span>BTT universe</span></div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+<div class="spinner"></div>
+<p>이미지 생성 중...</p>
+</div>
+
+<script>
+function handlePhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('photoPreviewBox').innerHTML = '<img src="' + e.target.result + '" alt="">';
+    document.getElementById('c_photo').innerHTML = '<img src="' + e.target.result + '" alt="">';
+  };
+  reader.readAsDataURL(file);
+}
+
+function setRow(id, value, displayId, valueElId) {
+  if (value && value.trim()) {
+    document.getElementById(displayId).style.display = 'flex';
+    if (valueElId) document.getElementById(valueElId).textContent = value;
+  } else {
+    document.getElementById(displayId).style.display = 'none';
+  }
+}
+
+function updateCard() {
+  const stage = document.getElementById('f_stage').value;
+  const job = document.getElementById('f_job').value;
+  const real = document.getElementById('f_real').value;
+  const birth = document.getElementById('f_birth').value;
+  const group = document.getElementById('f_group').value;
+  const agency = document.getElementById('f_agency').value;
+  const debut = document.getElementById('f_debut').value;
+  const position = document.getElementById('f_position').value;
+  const twitter = document.getElementById('f_twitter').value;
+
+  document.getElementById('c_name').textContent = stage || '활동명';
+  document.getElementById('c_searchTitle').textContent = (stage || '활동명') + ' 프로필';
+
+  const occEl = document.getElementById('c_occupation');
+  if (job && job.trim()) {
+    occEl.textContent = job;
+    occEl.style.display = 'block';
+  } else {
+    occEl.style.display = 'none';
+  }
+
+  setRow('real', real, 'r_real', 'c_real');
+  setRow('birth', birth, 'r_birth', 'c_birth');
+  setRow('group', group, 'r_group', 'c_group');
+  setRow('agency', agency, 'r_agency', 'c_agency');
+  setRow('debut', debut, 'r_debut', 'c_debut');
+  setRow('position', position, 'r_position', 'c_position');
+
+  const r_site = document.getElementById('r_site');
+  if (twitter && twitter.trim()) {
+    r_site.style.display = 'flex';
+    const handle = twitter.startsWith('@') ? twitter : '@' + twitter;
+    document.getElementById('c_twitter').textContent = handle;
+  } else {
+    r_site.style.display = 'none';
+  }
+}
+
+function downloadCard() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+  const card = document.getElementById('profileCard');
+  html2canvas(card, { scale:2, useCORS:true, allowTaint:true, backgroundColor:'#f0f1f4' }).then(function(canvas) {
+    const link = document.createElement('a');
+    const name = document.getElementById('f_stage').value || 'profile';
+    link.download = 'BTT_' + name + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    overlay.classList.remove('show');
+  }).catch(function() {
+    overlay.classList.remove('show');
+    alert('이미지 생성 실패. 다시 시도해주세요.');
+  });
+}
+
+updateCard();
+</script>
+
+</body>
+</html>
